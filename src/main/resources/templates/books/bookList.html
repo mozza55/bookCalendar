@@ -1,0 +1,104 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"/>
+<style>
+    p.bookinfo { margin-bottom: 0.01em; }
+    div.bookblock{
+        display: inline-block;
+        border-style: solid;
+        border-width: 1px;
+        border-color: lavender;
+        border-radius: 10px 10px 30px 10px;
+        width: 200px;
+        height: 300px;
+        margin: 20px;
+        text-align: center;
+        padding-top:10px;
+        transition: background-color 0.5s;
+    }
+    div.bookblock:hover{
+        background-color: #bfb9c7;
+    }
+    .pagination a{
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+    .pagination li.active a{
+        background-color: #866ec7;
+        color: white;
+    }
+
+</style>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+    <nav th:replace="fragments/sidebar :: sidebar"/>
+
+
+    <!-- Page Content  -->
+    <div id="content" class="p-4 p-md-5 pt-5" >
+        <nav>
+            <ul class="pagination"> <!-- style="list-style: none; display:flex;" -->
+                <li th:class="${orderBy.equals('readCount')} ? 'active'">
+                    <a th:href="@{/books(page=1, sort='readCount,desc')}" ><span>인기순</span></a>
+                </li>
+                <li th:class="${orderBy.equals('id')} ? 'active'" >
+                    <a th:href="@{/books(page=1, sort='id,desc')}" ><span>평점순</span></a>
+                </li>
+            </ul>
+        </nav>
+
+        <table>
+            <div  class="bookblock" th:each="book: ${bookList}">
+                <div>
+                    <a th:href="@{/books/detail/{bookId}(bookId=${book.id})}">
+                        <img src="/images/bookcover.jpeg" width="160">
+                    </a>
+                    <p class="bookinfo" th:text="${book.title}"></p>
+                    <p class="bookinfo" th:text="${book.author}"></p>
+                </div>
+            </div>
+        </table>
+
+        <nav style="padding-left: 30%;  text-align: center;">
+            <ul class="pagination"
+                th:with="start=${bookList.number - 1 > 0 ? bookList.number - 1  : 1},
+                    last=(${start + 4 < bookList.totalPages ? start + 4 : bookList.totalPages}),
+                        sortby = ${orderBy}+',desc' ">
+                <li>
+                    <a th:href="@{/books(page=1, sort=${sortby})}" aria-label="First">
+                        <span aria-hidden="true">First</span>
+                    </a>
+                </li>
+
+                <li th:class="${bookList.first} ? 'disabled'">
+                    <a th:href="${bookList.first} ? '#' :@{/books(page=${bookList.number}, sort=${sortby})}" aria-label="Previous">
+                        <span aria-hidden="true">&lt;</span>
+                    </a>
+                </li>
+
+                <li th:each="page: ${#numbers.sequence(start, last)}" th:class="${page == bookList.number + 1} ? 'active'">
+                    <a th:text="${page}" th:href="@{/books(page=${page}, sort=${sortby})}"></a>
+                </li>
+
+                <li th:class="${bookList.last} ? 'disabled'">
+                    <a th:href="${bookList.last} ? '#' : @{/books(page=${bookList.number + 2}, sort=${sortby})}" aria-label="Next">
+                        <span aria-hidden="true">&gt;</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/books(page=${bookList.totalPages}, sort=${sortby})}" aria-label="Last">
+                        <span aria-hidden="true">Last</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+
+</div>
+
+<th:block th:replace="fragments/script :: script" />
+</body>
+</html>

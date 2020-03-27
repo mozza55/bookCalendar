@@ -1,0 +1,45 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"/>
+<style>
+    p.bookinfo { margin-bottom: 0.01em; }
+</style>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+    <nav th:replace="fragments/sidebar :: sidebar"/>
+
+
+    <!-- Page Content  -->
+    <div id="content" class="p-4 p-md-5 pt-5" >
+        <div style="height: 10px"></div>
+        <div style="border-top: 1px solid #ccc;"></div>
+        <div style="height: 10px"></div>
+        <div style="display:flex;">
+            <div style="margin-left: 30px; margin-right: 30px">
+                <a href="/">
+                    <img src="/images/bookcover.jpeg" width="160">
+                </a>
+            </div>
+            <div>
+                <div style="height: 10px"></div>
+                <p th:text="${book.title}"></p>
+                <p th:text="${book.author}"></p>
+                <a class="btn btn-primary" style="color: white;"
+                   th:href="@{/members/{memberId}/add/book/{bookId} (memberId =${session.member ==null ? -1: session.member.id}, bookId=${book.id})}">서재에 담기</a>
+            </div>
+        </div>
+        <div style="height: 10px"></div>
+        <div style="border-top: 1px solid #ccc;"></div>
+        <div style="height: 10px"></div>
+        <div>
+            책 상세 페이지 입니다 *^^*
+        </div>
+
+    </div>
+
+</div>
+
+<th:block th:replace="fragments/script :: script" />
+</body>
+</html>

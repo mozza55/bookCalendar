@@ -1,0 +1,90 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"/>
+<style>
+    p.bookinfo { margin-bottom: 0.01em; }
+    div.bookblock{
+        display: inline-block;
+        border-style: solid;
+        border-width: 1px;
+        border-color: lavender;
+        border-radius: 10px 10px 30px 10px;
+        width: 200px;
+        height: 300px;
+        margin: 20px;
+        text-align: center;
+        padding-top:10px;
+        transition: background-color 0.5s;
+    }
+    div.bookblock:hover{
+        background-color: #bfb9c7;
+    }
+    .pagination a{
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+    .pagination li.active a{
+        background-color: #866ec7;
+        color: white;
+    }
+</style>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+    <nav th:replace="fragments/sidebar :: sidebar"/>
+
+
+    <!-- Page Content  -->
+    <div id="content" class="p-4 p-md-5 pt-5">
+        <table>
+            <div  class="bookblock" th:each="board: ${books}">
+                <div>
+                    <a href="/">
+                        <img src="/images/bookcover.jpeg" width="160">
+                    </a>
+                    <p class="bookinfo" th:text="${board.title}"></p>
+                    <p class="bookinfo" th:text="${board.author}"></p>
+                </div>
+            </div>
+        </table>
+
+        <nav style="padding-left: 45%; text-align: center;">
+            <ul class="pagination"
+                th:with="start=${page - 2 > 0 ? page - 2 : 1},last=${start + 4 < totalPages ? start +4 : totalPages}">
+                <li>
+                    <a  th:href="@{/v1/books(page=1)}" aria-label="First">
+                        <span aria-hidden="true">First</span>
+                    </a>
+                </li>
+
+                <li th:class="${page==1} ? 'disabled'">
+                    <a  th:href="${page==1}  ? '#' : @{/v1/books(page=${page - 1})}" aria-label="Previous">
+                        <span aria-hidden="true">&lt;</span>
+                    </a>
+                </li>
+
+                <li th:each="now: ${#numbers.sequence(start, last)}" th:class="${now == page} ? 'active'">
+                    <a  th:text="${now}" th:href="@{/v1/books(page=${now})}"></a>
+                </li>
+
+                <li th:class="${page == totalPages} ? 'disabled'">
+                    <a th:href="${page ==totalPages} ? '#' : @{/v1/books(page=${page + 1})}" aria-label="Next">
+                        <span aria-hidden="true">&gt;</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/v1/books(page=${totalPages})}" aria-label="Last">
+                        <span aria-hidden="true">Last</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+
+</div>
+
+<th:block th:replace="fragments/script :: script" />
+</body>
+</html>
