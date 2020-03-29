@@ -25,8 +25,19 @@
                 <div style="height: 10px"></div>
                 <p th:text="${book.title}"></p>
                 <p th:text="${book.author}"></p>
+                <!--
+                 로그인 한 경우
                 <a class="btn btn-primary" style="color: white;"
-                   th:href="@{/members/{memberId}/add/book/{bookId} (memberId =${session.member ==null ? -1: session.member.id}, bookId=${book.id})}">서재에 담기</a>
+                   th:unless="${session.member ==null}"
+                   th:href="@{/members/{memberId}/add/book/{bookId} (memberId=${session.member.id}, bookId=${book.id})}">서재에 담기</a>
+                 로그인 하지 않은 경우
+                <a class="btn btn-primary" style="color: white;"
+                   th:if="${session.member ==null}" href="javascript:page1()">서재에 담기</a>
+                -->
+                <a class="btn btn-primary" style="color: white;"
+                   th:href="${session.member !=null} ?
+                    'javascript:inventory_add(' + ${session.member.id} + ','+ ${book.id} +');'
+                    : 'javascript:page1()'">서재에 담기</a>
             </div>
         </div>
         <div style="height: 10px"></div>
@@ -39,7 +50,26 @@
     </div>
 
 </div>
-
 <th:block th:replace="fragments/script :: script" />
+
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+    });
+    function page1() {
+        alert("로그인이 필요한 서비스입니다");
+    }
+    function inventory_add(memberId, bookId) {
+        $.ajax({
+            url:"/members/"+ memberId + "/add/book/"+bookId,
+            type: "GET",
+            success:function (response) {
+                alert("서재에 담았습니다 :"+response);
+            }
+        });
+    }
+
+</script>
 </body>
 </html>

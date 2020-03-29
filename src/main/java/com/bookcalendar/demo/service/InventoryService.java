@@ -3,9 +3,7 @@ package com.bookcalendar.demo.service;
 import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.domain.Inventory;
 import com.bookcalendar.demo.domain.InventoryBook;
-import com.bookcalendar.demo.repository.BookV1Repository;
-import com.bookcalendar.demo.repository.InventoryBookRepository;
-import com.bookcalendar.demo.repository.InventoryRepository;
+import com.bookcalendar.demo.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,31 +15,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InventoryService {
 
-    private final InventoryRepository inventoryRepository;
-    private final InventoryBookRepository inventoryBookRepository;
+    private final InventoryV1Repository inventoryV1Repository;
+    private final InventoryBookV1Repository inventoryBookV1Repository;
     private final BookV1Repository bookV1Repository;
+    private final InventoryRepository inventoryRepository;
+    private final BookRepository bookRepository;
+    private final InventoryBookRepository inventoryBookRepository;
 
     //특정 유저의 책 목록 조회
-    public List<InventoryBook> findInventoryBooks(Long memberId){
+    public List<InventoryBook> findInventoryBookList(Long memberId){
         Inventory inventory= inventoryRepository.findByMemberId(memberId);
-        List<InventoryBook> inventoryBookList = inventoryBookRepository.findByInventoryId(inventory.getId());
+        List<InventoryBook> inventoryBookList = inventoryBookV1Repository.findByInventoryId(inventory.getId());
         return inventoryBookList;
     }
 
-    //책 담기
+    @Transactional//책 담기
     public Long addBook(Long memberId, Long bookId){
         Inventory inventory= inventoryRepository.findByMemberId(memberId);
-        Book book = bookV1Repository.findOne(bookId);
+        Book book = bookRepository.getOne(bookId);
         InventoryBook inventoryBook = InventoryBook.createInventoryBook(book);
         inventory.addBook(inventoryBook);
-        return  inventoryBook.getId();
+        InventoryBook savedBook = inventoryBookRepository.save(inventoryBook);
+        return  savedBook.getId();
     }
 
     //책 빼기
     public Long removeBook(Long memberId, Long inventoryBookId){
-        Inventory inventory = inventoryRepository.findByMemberId(memberId);
-        InventoryBook inventoryBook = inventoryBookRepository.findOne(inventoryBookId);
-        inventoryBookRepository.removeOne(inventoryBook);
+        Inventory inventory = inventoryV1Repository.findByMemberId(memberId);
+        InventoryBook inventoryBook = inventoryBookV1Repository.findOne(inventoryBookId);
+        inventoryBookV1Repository.removeOne(inventoryBook);
         return  inventory.getId();
     }
 

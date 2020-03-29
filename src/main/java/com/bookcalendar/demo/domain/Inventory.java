@@ -18,7 +18,7 @@ public class Inventory {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "inventory",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "inventory")
     private List<InventoryBook> inventoryBooks = new ArrayList<>();
 
     private int bookCount;
@@ -31,7 +31,7 @@ public class Inventory {
     public void addBook(InventoryBook inventoryBook){
         this.inventoryBooks.add(inventoryBook);
         inventoryBook.setInventory(this);
-        bookCount++;
+        //bookCount++;
     }
 
     public void removeBook(){

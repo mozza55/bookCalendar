@@ -1,30 +1,15 @@
 package com.bookcalendar.demo.repository;
 
+import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.domain.Inventory;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
+import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
-public class InventoryRepository {
+public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 
-    private final EntityManager em;
+    public Inventory findByMemberId(Long id);
 
-    public void save(Inventory inventory){
-        em.persist(inventory);
-    }
-
-    public Inventory findOne(Long id){
-        return em.find(Inventory.class, id);
-    }
-
-    //예외처리해줘야함 0개나 2개 이상일 때
-    public Inventory findByMemberId(Long memberId){
-        //select i from Inventory i join i.Member m
-        return em.createQuery("select i from Inventory i join Member m where m.id = :memberId",Inventory.class)
-                .setParameter("memberId", memberId)
-                .getSingleResult();
-    }
 }
