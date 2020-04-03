@@ -16,7 +16,9 @@
             <li>
                 <a href="/books">Book</a>
             </li>
-
+            <li>
+                <a th:href="@{/members/inventory/{inventoryId}(inventoryId=${session.member.inventory.id})}" th:unless="${session.member == null}">My Books</a>
+            </li>
             <li>
                 <a href="/admin">Admin</a>
             </li>

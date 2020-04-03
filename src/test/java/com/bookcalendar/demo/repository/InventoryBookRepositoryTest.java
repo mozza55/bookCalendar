@@ -36,6 +36,7 @@ public class InventoryBookRepositoryTest {
         InventoryBook savedBook = inventoryBookRepository.save(inventoryBook);
         //then
         assertEquals(savedBook.getId(), inventoryBook.getId());
+        assertEquals(savedBook.getId(), inventoryBook.getId());
         log.info("값 비교 "+savedBook.getId()+"vs"+inventoryBook.getId());
     }
 

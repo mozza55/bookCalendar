@@ -1,0 +1,63 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"/>
+<style>
+    p.bookinfo { margin-bottom: 0.01em; }
+    div.bookblock{
+        display: inline-block;
+        border-style: solid;
+        border-width: 1px;
+        border-color: lavender;
+        border-radius: 10px 10px 30px 10px;
+        width: 200px;
+        height: 300px;
+        margin: 20px;
+        text-align: center;
+        padding-top:10px;
+        transition: background-color 0.5s;
+    }
+    div.bookblock:hover{
+        background-color: #bfb9c7;
+    }
+    .pagination a{
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+    .pagination li.active a{
+        background-color: #866ec7;
+        color: white;
+    }
+
+</style>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+    <nav th:replace="fragments/sidebar :: sidebar"/>
+
+
+    <!-- Page Content  -->
+    <div id="content" class="p-4 p-md-5 pt-5" >
+        <div>
+            <span th:text="${inventory.bookCount}"></span>
+        </div>
+
+        <table>
+            <div  class="bookblock" th:each="inventoryBook: ${inventoryBookList}">
+                <div>
+                    <a th:href="@{/books/detail/{bookId}(bookId=${inventoryBook.book.id})}">
+                        <img src="/images/bookcover.jpeg" width="160">
+                    </a>
+                    <p class="bookinfo" th:text="${inventoryBook.book.title}"></p>
+                    <p class="bookinfo" th:text="${inventoryBook.book.author}"></p>
+                </div>
+            </div>
+        </table>
+
+
+    </div>
+
+</div>
+
+<th:block th:replace="fragments/script :: script" />
+</body>
+</html>

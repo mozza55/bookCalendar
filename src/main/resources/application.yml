@@ -4,6 +4,7 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+    data: db/data.sql
 
   jpa:
     hibernate:

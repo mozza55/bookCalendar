@@ -47,6 +47,15 @@
                 </li>
             </ul>
         </nav>
+        <div>
+            <form role="form" action="/books/search" method="post">
+                <div class="form-group" style="display: flex">
+                    <label th:for="search">검색</label>
+                    <input style="width: 300px" type="text" id="search" name="search" th:object="${search}" class="form-control" placeholder="검색어를 입력하세요">
+                    <button type="submit" class="btn btn-primary">검색</button>
+                </div>
+            </form>
+        </div>
 
         <table>
             <div  class="bookblock" th:each="book: ${bookList}">

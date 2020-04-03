@@ -3,6 +3,7 @@ package com.bookcalendar.demo.service;
 import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.repository.BookRepository;
 import com.bookcalendar.demo.repository.BookV1Repository;
+import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -56,4 +57,8 @@ public class BookService {
         return bookRepository.findAll(pageable);
     }
 
+
+    public Page<Book> getSearchList(String search, Pageable pageable) {
+        return bookRepository.getSearchList(search,pageable);
+    }
 }

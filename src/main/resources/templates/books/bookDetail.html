@@ -34,10 +34,11 @@
                 <a class="btn btn-primary" style="color: white;"
                    th:if="${session.member ==null}" href="javascript:page1()">서재에 담기</a>
                 -->
+                <span th:text="${session.member !=null} ? ${session.member.inventory.id}:dg"></span>
                 <a class="btn btn-primary" style="color: white;"
                    th:href="${session.member !=null} ?
-                    'javascript:inventory_add(' + ${session.member.id} + ','+ ${book.id} +');'
-                    : 'javascript:page1()'">서재에 담기</a>
+                    'javascript:inventory_add(' + ${session.member.inventory.id} + ','+ ${book.id} +');'
+                    : 'javascript:login()'">서재에 담기</a>
             </div>
         </div>
         <div style="height: 10px"></div>
@@ -57,12 +58,13 @@
     $(document).ready(function () {
 
     });
-    function page1() {
+    function login() {
         alert("로그인이 필요한 서비스입니다");
+        document.location.href="/members/login"
     }
-    function inventory_add(memberId, bookId) {
+    function inventory_add(inventoryId, bookId) {
         $.ajax({
-            url:"/members/"+ memberId + "/add/book/"+bookId,
+            url:"/members/"+ inventoryId + "/add/book/"+bookId,
             type: "GET",
             success:function (response) {
                 alert("서재에 담았습니다 :"+response);

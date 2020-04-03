@@ -1,9 +1,14 @@
 package com.bookcalendar.demo.controller;
 
+import com.bookcalendar.demo.domain.Inventory;
+import com.bookcalendar.demo.domain.InventoryBook;
 import com.bookcalendar.demo.domain.Member;
+import com.bookcalendar.demo.repository.InventoryBookRepository;
+import com.bookcalendar.demo.repository.InventoryRepository;
 import com.bookcalendar.demo.service.InventoryService;
 import com.bookcalendar.demo.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,13 +16,17 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
     private final InventoryService inventoryService;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryBookRepository inventoryBookRepository;
 
     @GetMapping("/members/join")
     public String joinForm(Model model){
@@ -73,11 +82,32 @@ public class MemberController {
         return "redirect:/";
     }
 
-    @GetMapping("/members/{memberId}/add/book/{bookId}")
+    @GetMapping("/members/{inventoryId}/add/book/{bookId}")
     @ResponseBody
-    public String addBookToInventory(@PathVariable Long memberId, @PathVariable Long bookId, HttpSession session, Model model){
-        Long savedInventoryBookId = inventoryService.addBook(memberId, bookId);
-        return savedInventoryBookId.toString();
+    public String addBookToInventory(@PathVariable Long inventoryId, @PathVariable Long bookId, HttpSession session, Model model){
+
+       try{
+           Long savedInventoryBookId = inventoryService.addBook(inventoryId, bookId);
+           return savedInventoryBookId.toString();
+       }catch (IllegalStateException e){
+           log.error("이미 등록된 책입니다.");
+           return "-1";
+       }
+    }
+
+    @GetMapping("/members/inventory/{inventoryId}")
+    public String getInventoryBookList(@PathVariable Long inventoryId, HttpSession session, Model model){
+        //세션에 있는 member의 inventory는 프록시 객체임!!! id만 가지고 있음
+        //Member member =(Member) session.getAttribute("member");
+        //Inventory findInventory = member.getInventory();
+        //log.info("=========="+findInventory.getId());
+        //log.info("=========="+findInventory.getInventoryBooks().size()); //초기화 안되이있어서 오류터짐
+
+        Inventory inventory = inventoryRepository.findById(inventoryId).get();
+        List<InventoryBook> inventoryBookList = inventoryBookRepository.findByInventoryIdWithBook(inventoryId);
+        model.addAttribute("inventory",inventory);
+        model.addAttribute("inventoryBookList",inventoryBookList);
+        return "inventories/bookList";
     }
 
 }
