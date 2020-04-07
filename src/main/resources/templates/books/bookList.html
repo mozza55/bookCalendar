@@ -37,6 +37,21 @@
 
     <!-- Page Content  -->
     <div id="content" class="p-4 p-md-5 pt-5" >
+        <div>
+            <form id ="search" th:object="${bookSearch}" role="form" action="/books/search" method="post">
+                <div class="form-group" style="display: flex">
+                    <select id ="searchField" th:field="*{searchField}">
+                        <option th:value="all">통합검색</option>
+                        <option th:value="title">제목</option>
+                        <option th:value="author">작가</option>
+                        <option th:value="publisher">출판사</option>
+                        <option th:value="isbn">isbn</option>
+                    </select>
+                    <input style="width: 300px" type="text" id="searchWord" name="searchWord" th:field="*{searchWord}" class="form-control" placeholder="검색어를 입력하세요">
+                    <button type="submit" class="btn btn-primary">검색</button>
+                </div>
+            </form>
+        </div>
         <nav>
             <ul class="pagination"> <!-- style="list-style: none; display:flex;" -->
                 <li th:class="${orderBy.equals('readCount')} ? 'active'">
@@ -47,15 +62,7 @@
                 </li>
             </ul>
         </nav>
-        <div>
-            <form role="form" action="/books/search" method="post">
-                <div class="form-group" style="display: flex">
-                    <label th:for="search">검색</label>
-                    <input style="width: 300px" type="text" id="search" name="search" th:object="${search}" class="form-control" placeholder="검색어를 입력하세요">
-                    <button type="submit" class="btn btn-primary">검색</button>
-                </div>
-            </form>
-        </div>
+
 
         <table>
             <div  class="bookblock" th:each="book: ${bookList}">
@@ -87,7 +94,10 @@
                 </li>
 
                 <li th:each="page: ${#numbers.sequence(start, last)}" th:class="${page == bookList.number + 1} ? 'active'">
-                    <a th:text="${page}" th:href="@{/books(page=${page}, sort=${sortby})}"></a>
+                    <!-- <a th:text="${page}" th:href="@{/books(page=${page}, sort=${sortby})}"></a>
+
+                    -->
+                    <a th:text="${page}" th:href="'javascript:page_set('+ ${page} +');'"></a>
                 </li>
 
                 <li th:class="${bookList.last} ? 'disabled'">
@@ -109,5 +119,90 @@
 </div>
 
 <th:block th:replace="fragments/script :: script" />
+<script th:inline="javascript">
+    $.fn.serializeObject = function()
+
+    {
+
+        var o = {};
+
+        var a = this.serializeArray();
+
+        $.each(a, function() {
+
+            if (o[this.name]) {
+
+                if (!o[this.name].push) {
+
+                    o[this.name] = [o[this.name]];
+
+                }
+
+                o[this.name].push(this.value || '');
+
+            } else {
+
+                o[this.name] = this.value || '';
+
+            }
+
+        });
+
+        return o;
+
+    };
+
+    $(document).ready(function () {
+
+    });
+    function temp() {
+        alert(
+            location.href);
+    }
+    function page_set(p) {
+        /*<![CDATA[*/
+        var page = p-1;
+        alert(location.pathname+'?page='+page+'&sort='+/*[[ ${orderBy} ]]*/);
+        var form = document.createElement('form');
+        form.setAttribute('method', 'post');
+        form.setAttribute('action', location.pathname+'?page='+page+'&sort='+/*[[ ${orderBy} ]]*/);
+        document.charset = "utf-8";
+        var searchWord = document.createElement("input");
+        searchWord.setAttribute("name","searchWord")
+        searchWord.setAttribute("value",/*[[ ${bookSearch.searchWord} ]]*/)
+        form.appendChild(searchWord)
+        var searchField = document.createElement("input");
+        searchField.setAttribute("name","searchField")
+        searchField.setAttribute("value", /*[[ ${bookSearch.searchField} ]]*/)
+        form.appendChild(searchField)
+        document.body.appendChild(form);
+
+        form.submit();
+        /* ]]> */
+    }
+    function page_set1(p) {
+        /*<![CDATA[*/
+
+        alert(searchField);
+        $.ajax({
+            type: 'POST',
+            url: location.href,
+            data: {
+                page : page,
+                searchWord : /*[[ ${bookSearch.searchWord} ]]*/,
+                searchField : /*[[ ${bookSearch.searchField} ]]*/
+
+            },
+            dataType: 'json',
+            success: function () {
+                alert("ggg")
+            },error : function (data) {
+                alert(data);
+            }
+        })
+        /* ]]> */
+    }
+
+</script>
 </body>
 </html>

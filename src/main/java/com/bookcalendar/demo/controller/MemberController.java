@@ -36,12 +36,11 @@ public class MemberController {
 
     @PostMapping("/members/join")
     public String join(Model model,MemberForm memberForm){
-
-
-        Member member = new Member();
-        member.setUserid(memberForm.getUserid());
-        member.setNickname(memberForm.getNickname());
-        member.setPassword(memberForm.getPassword());
+        Member member = Member.createMember(
+                                memberForm.getUserid()
+                                ,memberForm.getPassword()
+                                ,memberForm.getUsername()
+                                ,memberForm.getNickname());
         try {
             memberService.join(member);
         }catch (IllegalStateException e){

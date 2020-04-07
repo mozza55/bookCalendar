@@ -31,6 +31,14 @@ public class Member {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
     private Calendar calendar;
 
+    public static Member createMember(String userid, String password, String username, String nickname) {
+        Member member = new Member();
+        member.setUserid(userid);
+        member.setPassword(password);
+        member.setUsername(username);
+        member.setNickname(nickname);
+        return member;
+    }
     //연관관계 편의메서드
     public void setInventory(Inventory inventory){
         this.inventory = inventory;

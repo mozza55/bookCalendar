@@ -4,10 +4,7 @@ import com.bookcalendar.demo.exception.NotEnoughCountException;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter @Setter
@@ -20,7 +17,13 @@ public class Book {
 
     private String author;
 
+    private String publisher;
+
     private String isbn;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="category_id")
+    private Category category;
 
     private double rating;
 
@@ -28,10 +31,12 @@ public class Book {
 
     private int readCount;
 
-    public static Book createBook(String title, String author, String isbn, int page){
+
+    public static Book createBook(String title, String author, String publisher, String isbn, int page){
         Book book = new Book();
         book.title=title;
         book.author=author;
+        book.publisher=publisher;
         book.isbn=isbn;
         book.page=page;
         book.readCount=0;

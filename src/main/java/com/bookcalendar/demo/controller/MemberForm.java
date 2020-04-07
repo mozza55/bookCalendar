@@ -8,7 +8,8 @@ public class MemberForm {
 
     private Long memberid;
     private String userid;
-    private String nickname;
     private String password;
+    private String nickname;
+    private String username;
 
 }

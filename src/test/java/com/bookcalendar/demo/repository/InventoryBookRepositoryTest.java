@@ -27,7 +27,7 @@ public class InventoryBookRepositoryTest {
     @Test
     public void testSave() throws Exception{
         //given
-        Book book = Book.createBook("제목","작가","1234",200);
+        Book book = Book.createBook("제목","작가","출판사","1234",200);
         bookRepository.save(book);
         InventoryBook inventoryBook = InventoryBook.createInventoryBook(book);
         //when

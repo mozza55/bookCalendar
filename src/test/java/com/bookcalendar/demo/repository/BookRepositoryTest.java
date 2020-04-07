@@ -30,9 +30,9 @@ public class BookRepositoryTest {
     public void testQuerydsl() throws Exception{
         log.info("proxy : "+bookRepository.getClass());
         //given
-        Book book1 = Book.createBook("제목입니다","작가","123",200);
+        Book book1 = Book.createBook("제목입니다","작가","출판사","123",200);
         bookRepository.save(book1);
-        Book book2 = Book.createBook("제목d","d","123",200);
+        Book book2 = Book.createBook("제목d","d","출판사","123",200);
         bookRepository.save(book2);
         //when
         Book findBook = bookRepository.findAllBySearch("목","d");
@@ -45,7 +45,7 @@ public class BookRepositoryTest {
 
     @Test
     public void querydsl() throws Exception{
-        Book book = Book.createBook("제목입니다","작가","123",200);
+        Book book = Book.createBook("제목입니다","작가","출판사","123",200);
         bookRepository.save(book);
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 

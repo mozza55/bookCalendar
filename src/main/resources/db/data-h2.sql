@@ -1,0 +1,2 @@
+INSERT INTO Member(member_id, userid, password, username, nickname) values (1, 'abc','1234','김망고','망고');
+INSERT INTO Member(member_id, userid, password, username, nickname) values (3, 'aaa','1234','구아바','망고친구');

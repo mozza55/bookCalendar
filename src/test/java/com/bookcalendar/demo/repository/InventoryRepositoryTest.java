@@ -46,7 +46,7 @@ public class InventoryRepositoryTest {
     public void testFindByIdWithInventory() throws Exception{
         //given
 
-        Book book = Book.createBook("제목","작가","123",200);
+        Book book = Book.createBook("제목","작가","출판사","123",200);
         bookRepository.save(book);
         InventoryBook inventoryBook = InventoryBook.createInventoryBook(book);
         Long memberId = memberRepository.findByUserId("abc").getId();
