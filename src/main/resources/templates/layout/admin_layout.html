@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+<head>
+    <th:block th:include="fragments/header"></th:block>
+    <th:block layout:fragment="custom_css"></th:block>
+    <style layout:fragment="content_css"></style>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav th:replace="admin/sidebar :: sidebar"/>
+        <!-- Page Content  -->
+        <div id="content" class="p-4 p-md-5 pt-5" >
+            <section layout:fragment="top_header"></section>
+            <section layout:fragment="f-content"> </section>
+        </div>
+    </div>
+    <th:block th:replace="fragments/script :: script" />
+    <th:block layout:fragment="content_js"></th:block>
+</body>
+</html>

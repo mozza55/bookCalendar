@@ -7,10 +7,10 @@ import com.bookcalendar.demo.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,34 +42,20 @@ public class BookController {
         return "redirect:/admin";
     }
 
-    //Pageable 사용 안하고 페이지네이션
-    @GetMapping("/v1/books")
-    public String getBookList2(@RequestParam(value = "page", required = false)Integer page, Model model){
-        if(page ==null) page =1;
-        int booksPerPage = 3;
-        List<Book> bookList = bookService.getBookList(page,booksPerPage);
-        Long totalBooks = bookService.getTotalBooks();
-        Long totalPages =( (totalBooks%booksPerPage==0 )? totalBooks/booksPerPage: totalBooks/booksPerPage +1);
-
-        model.addAttribute("books",bookList);
-        model.addAttribute("page",page.intValue() );
-        model.addAttribute("totalPages",totalPages);
-        return "books/bookListV1";
-    }
-
     @GetMapping("/v2/books")
     public String getBookListV1(@RequestParam(value = "page", defaultValue = "1")int page, @RequestParam(value = "sort", defaultValue = "readCount")String sort, Model model){
         Page<Book> bookList = bookService.getBookList(page,3, sort);
         model.addAttribute("bookList",bookList);
         String orderBy = sort;
         model.addAttribute("orderBy",orderBy);
-        return "books/bookList";
+        return "books/bookIndex";
     }
 
     @GetMapping("/books/detail/{id}")
     public String bookDetail(@PathVariable Long id, Model model){
         Book book = bookRepository.getOne(id);
         model.addAttribute("book",book);
+        model.addAttribute("bookSearch",new BookSearch());
 
         return "books/bookDetail";
     }
@@ -82,11 +68,12 @@ public class BookController {
         model.addAttribute("bookSearch",new BookSearch());
         log.info("orderBy : "+orderBy);
         log.info("page : "+pageable.getPageNumber());
-        return "books/bookList";
+        return "books/bookIndex";
     }
-    @PostMapping("/books/search")
-    public String searchBook(@PageableDefault(page=0, size =1, sort = "readCount",direction = Sort.Direction.DESC) Pageable pageable,
+    @PostMapping("/books/search1")
+    public String searchBook1(@PageableDefault(page=0, size =1, sort = "readCount",direction = Sort.Direction.DESC) Pageable pageable,
                              BookSearch bookSearch, Model model){
+
         log.info("검색어 : "+bookSearch.searchWord);
         log.info("검색조건 : "+bookSearch.searchField);
         log.info(pageable.getSort().toString());
@@ -98,9 +85,24 @@ public class BookController {
         model.addAttribute("bookList",searchList);
         model.addAttribute("bookSearch",bookSearch);
 
-        return "books/bookList";
+        return "books/searchList";
     }
 
+    @PostMapping("/books/search")
+    public String searchBook(@RequestParam(defaultValue = "0")int page, @RequestParam(defaultValue = "readCount") String sortBy,
+                                 BookSearch bookSearch, Model model){
+        int size =2; //pagesize
+        log.info("검색어, 검색 조건 : "+bookSearch.searchWord+", "+bookSearch.searchField);
+        log.info("page, sortBy :"+page+", "+sortBy);
+        Pageable pageable = PageRequest.of(page,size, Sort.Direction.DESC,sortBy);
+        model.addAttribute("sortBy",sortBy);
+
+        Page<Book> searchList = bookRepository.findAllByBookSearch(bookSearch, pageable);
+        model.addAttribute("bookList",searchList);
+        model.addAttribute("bookSearch",bookSearch);
+
+        return "books/searchList";
+    }
     @PostMapping("/books/test")
     @ResponseBody
     public String test(@RequestBody BookSearch bookSearch){

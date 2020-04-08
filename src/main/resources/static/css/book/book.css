@@ -1,0 +1,35 @@
+p.bookinfo { margin-bottom: 0.01em; }
+div.bookblock{
+    display: inline-block;
+    border-style: solid;
+    border-width: 1px;
+    border-color: lavender;
+    border-radius: 10px 10px 30px 10px;
+    width: 200px;
+    height: 300px;
+    margin: 20px;
+    text-align: center;
+    padding-top:10px;
+    transition: background-color 0.5s;
+}
+div.bookblock:hover{
+    background-color: #bfb9c7;
+}
+.navigation_bar{
+    background-color: #a993c7;
+    height: 40px;
+}
+.navigation_bar .nb_main{
+    padding-inline-start: 20px;
+    display: flex;
+    list-style: none;
+}
+.navigation_bar .nb_main a{
+    position: relative;
+    display: inline-block;
+    font-size: 15px;
+    color: white;
+    padding: 7px 10px 0px 10px;
+    height: 30px;
+
+}

@@ -1,13 +1,10 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header"/>
-<body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/main_layout">
 
-<div class="wrapper d-flex align-items-stretch">
-    <nav th:replace="fragments/sidebar :: sidebar"/>
-
-    <!-- Page Content  -->
-    <div id="content" class="p-4 p-md-5 pt-5">
+<section layout:fragment="f-content">
+    <div class="login_form" style="width: 300px">
         <label>로그인</label>
         <form role="form" action="/members/login" th:object="${member}"
               method="post">
@@ -22,7 +19,4 @@
             <button type="submit" class="btn btn-primary">login</button>
         </form>
     </div>
-</div>
-<th:block th:replace="fragments/script :: script" />
-</body>
-</html>
+</section>

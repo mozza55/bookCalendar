@@ -1,0 +1,33 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="top_header" th:fragment="bookHeader" >
+    <div class="searcharea">
+        <form id ="search" th:object="${bookSearch}" role="form" action="/books/search" method="post">
+            <div class="form-group" style="display: flex">
+                <select id ="searchField" th:field="*{searchField}">
+                    <option th:value="all">통합검색</option>
+                    <option th:value="title">제목</option>
+                    <option th:value="author">작가</option>
+                    <option th:value="publisher">출판사</option>
+                    <option th:value="isbn">isbn</option>
+                </select>
+                <input style="width: 300px" type="text" id="searchWord" name="searchWord" th:field="*{searchWord}" class="form-control" placeholder="검색어를 입력하세요">
+                <button type="submit" class="btn btn-primary">검색</button>
+            </div>
+        </form>
+    </div>
+    <div class="navigation_bar">
+        <ul class="nb_main">
+            <li>
+                <a>베스트</a>
+            </li>
+            <li>
+                <a>새로나온책</a>
+            </li>
+            <li>
+                <a>추천</a>
+            </li>
+        </ul>
+    </div>
+</div>
+</html>

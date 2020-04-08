@@ -1,15 +1,13 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header"/>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/book_layout">
+
 <style>
     p.bookinfo { margin-bottom: 0.01em; }
 </style>
-<body>
 
-<div class="wrapper d-flex align-items-stretch">
-    <nav th:replace="fragments/sidebar :: sidebar"/>
-
-
+<section layout:fragment="f-content">
     <!-- Page Content  -->
     <div id="content" class="p-4 p-md-5 pt-5" >
         <div style="height: 10px"></div>
@@ -50,28 +48,26 @@
 
     </div>
 
-</div>
-<th:block th:replace="fragments/script :: script" />
+</section>
+<th:block layout:fragment="content_js">
+    <script th:inline="javascript">
 
-<script th:inline="javascript">
+        $(document).ready(function () {
 
-    $(document).ready(function () {
-
-    });
-    function login() {
-        alert("로그인이 필요한 서비스입니다");
-        document.location.href="/members/login"
-    }
-    function inventory_add(inventoryId, bookId) {
-        $.ajax({
-            url:"/members/"+ inventoryId + "/add/book/"+bookId,
-            type: "GET",
-            success:function (response) {
-                alert("서재에 담았습니다 :"+response);
-            }
         });
-    }
+        function login() {
+            alert("로그인이 필요한 서비스입니다");
+            document.location.href="/members/login"
+        }
+        function inventory_add(inventoryId, bookId) {
+            $.ajax({
+                url:"/members/"+ inventoryId + "/add/book/"+bookId,
+                type: "GET",
+                success:function (response) {
+                    alert("서재에 담았습니다 :"+response);
+                }
+            });
+        }
 
-</script>
-</body>
-</html>
+    </script>
+</th:block>
