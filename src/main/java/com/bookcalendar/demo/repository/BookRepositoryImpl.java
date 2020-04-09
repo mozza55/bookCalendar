@@ -65,7 +65,7 @@ public class BookRepositoryImpl
         JPQLQuery<Book> query = from(book)
                 .where(builder)
                 .distinct();
-        Long totalCount = from(book).fetchCount();
+        Long totalCount = query.fetchCount();
         List<Book> results = getQuerydsl().applyPagination(pageable, query).fetch();
         return new PageImpl<>(results,pageable,totalCount);
     }

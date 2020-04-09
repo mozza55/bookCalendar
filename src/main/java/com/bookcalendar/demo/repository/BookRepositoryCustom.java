@@ -10,4 +10,5 @@ public interface BookRepositoryCustom {
     Book findAllBySearch(String title, String author);
 
     Page<Book> findAllByBookSearch(BookSearch bookSearch, Pageable pageable);
+
 }

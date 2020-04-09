@@ -23,24 +23,15 @@
 </style>
 
 <section layout:fragment="f-content">
-    <nav class="search_by">
-        <div>
-            <table>
-                <td>
-                    <span th:text="${bookList.totalElements}" style="font:bold; color:#866ec7; font-size: 18px "></span>
-                    <span>개의 책이 검색되었습니다.</span>
+    <div>
+        <table>
+            <tr>
+                <td><span th:text="산정기간" style="font:bold; color:#866ec7; font-size: 18px "></span>
                 </td>
-            </table>
-        </div>
-        <ul class="pagination" style="width:100%"> <!-- style="list-style: none; display:flex;" -->
-            <li th:class="${sortBy.equals('readCount')} ? 'active'">
-                <a th:href="'javascript:search_by(\'readCount\');'" ><span>인기순</span></a>
-            </li>
-            <li th:class="${sortBy.equals('rating')} ? 'active'" >
-                <a th:href="'javascript:search_by(\'rating\');'" ><span>평점순</span></a>
-            </li>
-        </ul>
-    </nav>
+            </tr>
+            <tr><td><span>읽은 횟수, 서재에 담은 횟수 기준으로 집계되었습니다</span></td></tr>
+        </table>
+    </div>
     <div class="div-liner">
         <div style="height: 10px"></div>
         <div style="border-top: 1px solid #ccc;"></div>
@@ -92,24 +83,8 @@
 </section>
 <th:block layout:fragment="content_js">
     <script th:inline="javascript">
-        function search_by(sort) {
-            /*<![CDATA[*/
-            var searchWord =/*[[ ${bookSearch.searchWord} ]]*/;
-            var searchField =/*[[ ${bookSearch.searchField} ]]*/;
-            var sortBy =sort;
-            location.href=location.pathname+'?searchWord='+searchWord+
-                '&searchField='+searchField+'&sortBy='+sortBy;
-            /* ]]> */
-        }
         function page_set(page) {
-            /*<![CDATA[*/
-            var searchWord =/*[[ ${bookSearch.searchWord} ]]*/;
-            var searchField =/*[[ ${bookSearch.searchField} ]]*/;
-            var sortBy =/*[[ ${sortBy} ]]*/;
-            location.href=location.pathname+'?searchWord='+searchWord+
-                            '&searchField='+searchField+
-                            '&page='+page+'&sortBy='+sortBy;
-            /* ]]> */
+            location.href=location.pathname+'?page='+page
         }
 
     </script>

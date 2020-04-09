@@ -88,10 +88,10 @@ public class BookController {
         return "books/searchList";
     }
 
-    @PostMapping("/books/search")
+    @GetMapping("/books/search")
     public String searchBook(@RequestParam(defaultValue = "0")int page, @RequestParam(defaultValue = "readCount") String sortBy,
                                  BookSearch bookSearch, Model model){
-        int size =2; //pagesize
+        int size =3; //pagesize
         log.info("검색어, 검색 조건 : "+bookSearch.searchWord+", "+bookSearch.searchField);
         log.info("page, sortBy :"+page+", "+sortBy);
         Pageable pageable = PageRequest.of(page,size, Sort.Direction.DESC,sortBy);
@@ -101,7 +101,23 @@ public class BookController {
         model.addAttribute("bookList",searchList);
         model.addAttribute("bookSearch",bookSearch);
 
+
         return "books/searchList";
+    }
+
+    @GetMapping("/books/bestseller")
+    public String searchBestBook(
+            @RequestParam(defaultValue = "1") int groupBy,
+            @RequestParam(defaultValue = "0")int page,
+                                 Model model){
+        //groupBy == 1 월간 검색
+        //groupBy == 2 주간 검색
+        int size =3; //pagesize
+        Pageable pageable = PageRequest.of(page,size, Sort.Direction.DESC,"readCount");
+        Page<Book> searchList = bookRepository.findAll(pageable);
+        model.addAttribute("bookList",searchList);
+        model.addAttribute("bookSearch",new BookSearch());
+        return "books/bestList";
     }
     @PostMapping("/books/test")
     @ResponseBody

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <div class="top_header" th:fragment="bookHeader" >
     <div class="searcharea">
-        <form id ="search" th:object="${bookSearch}" role="form" action="/books/search" method="post">
+        <form id ="search" th:object="${bookSearch}" role="form" action="/books/search" method="get">
             <div class="form-group" style="display: flex">
                 <select id ="searchField" th:field="*{searchField}">
                     <option th:value="all">통합검색</option>
@@ -19,7 +19,7 @@
     <div class="navigation_bar">
         <ul class="nb_main">
             <li>
-                <a>베스트</a>
+                <a href="/books/bestseller">베스트</a>
             </li>
             <li>
                 <a>새로나온책</a>
