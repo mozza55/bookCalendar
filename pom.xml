@@ -99,6 +99,12 @@
             <artifactId>querydsl-jpa</artifactId>
             <version>${querydsl.version}</version>
         </dependency>
+        <!-- 서브쿼리용 -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-sql-spring</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
 
         <!-- layout-->
         <dependency>

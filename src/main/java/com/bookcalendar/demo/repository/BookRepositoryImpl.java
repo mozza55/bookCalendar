@@ -1,16 +1,24 @@
 package com.bookcalendar.demo.repository;
 
+import com.bookcalendar.demo.domain.Bestbook;
 import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.domain.QBook;
+import com.bookcalendar.demo.domain.QInventoryBook;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.sql.SQLExpressions;
+import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 
 //@NoRepositoryBean //있으면 안됨
@@ -69,4 +77,5 @@ public class BookRepositoryImpl
         List<Book> results = getQuerydsl().applyPagination(pageable, query).fetch();
         return new PageImpl<>(results,pageable,totalCount);
     }
+
 }

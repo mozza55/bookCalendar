@@ -9,6 +9,10 @@ import com.bookcalendar.demo.service.InventoryService;
 import com.bookcalendar.demo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -95,7 +99,9 @@ public class MemberController {
     }
 
     @GetMapping("/members/inventory/{inventoryId}")
-    public String getInventoryBookList(@PathVariable Long inventoryId, HttpSession session, Model model){
+    public String getInventoryBookList(@PathVariable Long inventoryId,
+                                       @PageableDefault(page = 0,size = 6)Pageable pageable, //,sort = "addDate",direction = Sort.Direction.DESC
+                                       Model model){
         //세션에 있는 member의 inventory는 프록시 객체임!!! id만 가지고 있음
         //Member member =(Member) session.getAttribute("member");
         //Inventory findInventory = member.getInventory();
@@ -103,9 +109,9 @@ public class MemberController {
         //log.info("=========="+findInventory.getInventoryBooks().size()); //초기화 안되이있어서 오류터짐
 
         Inventory inventory = inventoryRepository.findById(inventoryId).get();
-        List<InventoryBook> inventoryBookList = inventoryBookRepository.findByInventoryIdWithBook(inventoryId);
+        Page<InventoryBook> inventoryBookList = inventoryBookRepository.findByInventoryIdWithBook(inventoryId,pageable);
         model.addAttribute("inventory",inventory);
-        model.addAttribute("inventoryBookList",inventoryBookList);
+        model.addAttribute("bookList",inventoryBookList);
         return "inventories/bookList";
     }
 

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name="inventory_book")
@@ -26,7 +27,8 @@ public class InventoryBook {
 
     private int currentPage;
     private int page;
-
+    private LocalDate addDate;
+    private LocalDate readDate;
     private String comment;
 
     //생성 메서드
@@ -36,6 +38,7 @@ public class InventoryBook {
         inventoryBook.setPage(book.getPage());
         inventoryBook.setCurrentPage(0);
         inventoryBook.setStatus(ReadStatus.TODO);
+        inventoryBook.setAddDate(LocalDate.now());
         return  inventoryBook;
     }
 

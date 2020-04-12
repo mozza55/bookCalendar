@@ -19,7 +19,6 @@ public class InventoryService {
 
     private final InventoryV1Repository inventoryV1Repository;
     private final InventoryBookV1Repository inventoryBookV1Repository;
-    private final BookV1Repository bookV1Repository;
     private final InventoryRepository inventoryRepository;
     private final BookRepository bookRepository;
     private final InventoryBookRepository inventoryBookRepository;
@@ -62,8 +61,4 @@ public class InventoryService {
         return  inventory.getId();
     }
 
-
-    public List<InventoryBook> getInventoryBookList(Long inventoryId) {
-        return inventoryBookRepository.findByInventoryIdWithBook(inventoryId);
-    }
 }

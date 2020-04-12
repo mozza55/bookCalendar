@@ -2,7 +2,9 @@ package com.bookcalendar.demo.controller;
 
 import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.repository.BookRepository;
+import com.bookcalendar.demo.repository.BookScoreDto;
 import com.bookcalendar.demo.repository.BookSearch;
+import com.bookcalendar.demo.service.BestbookService;
 import com.bookcalendar.demo.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +13,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -24,6 +28,7 @@ public class BookController {
 
     private final BookRepository bookRepository;
     private final BookService bookService;
+    private final BestbookService bestbookService;
 
     @GetMapping("/books/create")
     public String createForm(Model model){
@@ -108,6 +113,9 @@ public class BookController {
     @GetMapping("/books/bestseller")
     public String searchBestBook(
             @RequestParam(defaultValue = "1") int groupBy,
+            @RequestParam(required = false) String year,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String week,
             @RequestParam(defaultValue = "0")int page,
                                  Model model){
         //groupBy == 1 월간 검색
@@ -125,5 +133,11 @@ public class BookController {
         log.info("name : "+bookSearch.searchWord);
         log.info("name : "+bookSearch.searchField);
         return bookSearch.toString();
+    }
+
+    @GetMapping("/books/best")
+    @ResponseBody
+    public List<BookScoreDto> getBestbook(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localDate){
+        return bestbookService.getBestBookList(localDate);
     }
 }
