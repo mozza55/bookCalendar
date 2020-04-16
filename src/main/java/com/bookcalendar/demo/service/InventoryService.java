@@ -41,6 +41,7 @@ public class InventoryService {
         validateDuplicateBook(inventoryId,bookId);
         //책 추가
         Book book = bookRepository.getOne(bookId);
+        book.addAddCount();
         InventoryBook inventoryBook = InventoryBook.createInventoryBook(book);
         Inventory inventory= inventoryRepository.getOne(inventoryId);
         inventory.addBook(inventoryBook);

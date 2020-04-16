@@ -11,16 +11,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -87,14 +86,15 @@ public class MemberController {
 
     @GetMapping("/members/{inventoryId}/add/book/{bookId}")
     @ResponseBody
-    public String addBookToInventory(@PathVariable Long inventoryId, @PathVariable Long bookId, HttpSession session, Model model){
+    public ResponseEntity<Object> addBookToInventory(@PathVariable Long inventoryId, @PathVariable Long bookId, HttpSession session, Model model){
 
        try{
            Long savedInventoryBookId = inventoryService.addBook(inventoryId, bookId);
-           return savedInventoryBookId.toString();
+           return new ResponseEntity<>(savedInventoryBookId.toString(),HttpStatus.OK);
        }catch (IllegalStateException e){
            log.error("이미 등록된 책입니다.");
-           return "-1";
+           String message = "이미 등록된 책입니다";
+           return new ResponseEntity<>(message,HttpStatus.CONFLICT);
        }
     }
 
@@ -112,7 +112,12 @@ public class MemberController {
         Page<InventoryBook> inventoryBookList = inventoryBookRepository.findByInventoryIdWithBook(inventoryId,pageable);
         model.addAttribute("inventory",inventory);
         model.addAttribute("bookList",inventoryBookList);
-        return "inventories/bookList";
+        return "inventories/inventory";
+    }
+
+    @GetMapping("/members/calendar")
+    public String getCalendar(){
+        return "members/calendar";
     }
 
 }

@@ -34,6 +34,7 @@ public class Book {
     private int page;
 
     private int readCount;
+    private int addCount;
 
 
     public static Book createBook(String title, String author, String publisher, String isbn, int page){
@@ -44,11 +45,13 @@ public class Book {
         book.isbn=isbn;
         book.page=page;
         book.readCount=0;
+        book.addCount=0;
         book.rating =0;
         return book;
     }
     //비지니스 로직
     public void addReadCount(){ this.readCount++; }
+    public void addAddCount(){ this.addCount++; }
     public void removeReadCount(){
         if(this.readCount-1 <0 ){
             throw new NotEnoughCountException("읽은 독자 없음");

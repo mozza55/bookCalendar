@@ -1,0 +1,31 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/main_layout">
+<th:block layout:fragment="custom_css">
+    <link href='/fullcalendar/core/main.css' rel='stylesheet' />
+    <link href='/fullcalendar/daygrid/main.css' rel='stylesheet' />
+
+    <script src='/fullcalendar/core/main.js'></script>
+    <script src='/fullcalendar/daygrid/main.js'></script>
+
+</th:block>
+<th:block layout:fragment="custom_js">
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: [ 'dayGrid' ]
+            });
+
+            calendar.render();
+        });
+
+    </script>
+</th:block>
+<section layout:fragment="f-content">
+    <div id='calendar'></div>
+</section>
+

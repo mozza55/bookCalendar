@@ -2,6 +2,7 @@ package com.bookcalendar.demo.controller;
 
 import com.bookcalendar.demo.domain.Bestbook;
 import com.bookcalendar.demo.domain.Book;
+import com.bookcalendar.demo.dto.EventDto;
 import com.bookcalendar.demo.repository.BestbookRepository;
 import com.bookcalendar.demo.repository.BookRepository;
 import com.bookcalendar.demo.repository.BookScoreDto;
@@ -175,5 +176,13 @@ public class BookController {
     public List<BookScoreDto> getBestbook(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localDate,
                                           @RequestParam(defaultValue = "1") int groupBy){
         return bestbookService.setBestbook(localDate,groupBy);
+    }
+
+
+    @PostMapping("/books/read")
+    @ResponseBody
+    public String readEvent(EventDto event){
+
+        return null;
     }
 }

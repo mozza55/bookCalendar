@@ -3,8 +3,21 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="layout/book_layout">
 
-<style>
-    p.bookinfo { margin-bottom: 0.01em; }
+<style layout:fragment="content_css">
+    .book_info {
+        width: 100%;
+    }
+    .book_info ul{
+        list-style: none;
+        padding-inline-start: 0px;
+    }
+    .book_info .bi_title{
+         font-size: 20px;
+     }
+    .book_info .bi_author{
+        font-size: 18px;
+    }
+
 </style>
 
 <section layout:fragment="f-content">
@@ -21,31 +34,46 @@
                     <img src="/images/bookcover.jpeg" width="160">
                 </a>
             </div>
-            <div>
+            <div class="book_info">
                 <div style="height: 10px"></div>
-                <p th:text="${book.title}"></p>
-                <p th:text="${book.author}"></p>
-                <!--
-                 로그인 한 경우
-                <a class="btn btn-primary" style="color: white;"
-                   th:unless="${session.member ==null}"
-                   th:href="@{/members/{memberId}/add/book/{bookId} (memberId=${session.member.id}, bookId=${book.id})}">서재에 담기</a>
-                 로그인 하지 않은 경우
-                <a class="btn btn-primary" style="color: white;"
-                   th:if="${session.member ==null}" href="javascript:page1()">서재에 담기</a>
-                -->
-                <span th:text="${session.member !=null} ? ${session.member.inventory.id}:dg"></span>
-                <a class="btn btn-primary" style="color: white;"
-                   th:href="${session.member !=null} ?
-                    'javascript:inventory_add(' + ${session.member.inventory.id} + ','+ ${book.id} +');'
-                    : 'javascript:login()'">서재에 담기</a>
+                <ul>
+                    <li class="bi_title">
+                        <span th:text="${book.title}"></span>
+                    </li>
+                    <li class="bi_author">
+                        <span th:text="${book.author}"></span>
+                    </li>
+                    <li class="bi_publisher">
+                        <span th:text="${book.publisher}"></span>
+                    </li>
+                    <li><div style="border-top: 1px solid #ccc; height: 10px; margin-top: 10px;"></div></li>
+                    <li>
+                        <span th:text="${book.readCount}+'명이 끝까지 읽었습니다!'"></span>
+                    </li>
+                    <li>
+                        <span id="addCount" th:text="${book.addCount}"></span>
+                        <span>명이 서재에 담았습니다!</span>
+                    </li>
+                    <li>
+                        <a class="btn btn-primary"
+                           th:href="${session.member ==null} ?'javascript:login()':
+                            'javascript:inventory_add(' + ${session.member.inventory.id} + ','+ ${book.id} +');'
+                             ">서재에 담기</a>
+                        <a class="btn btn-primary"
+                           th:href="${session.member ==null} ?'javascript:login()':
+                            'javascript:inventory_add(' + ${session.member.inventory.id} + ','+ ${book.id} +');'
+                             ">독서 기록 추가</a>
+                    </li>
+                </ul>
             </div>
         </div>
         <div style="height: 10px"></div>
         <div style="border-top: 1px solid #ccc;"></div>
         <div style="height: 10px"></div>
         <div>
-            책 상세 페이지 입니다 *^^*
+            <span th:text="'isbn : '+${book.isbn}"></span>
+            <p></p>
+            <span>책 상세 페이지 입니다 *^^*</span>
         </div>
 
     </div>
@@ -62,13 +90,20 @@
             document.location.href="/members/login"
         }
         function inventory_add(inventoryId, bookId) {
+            /*<![CDATA[*/
             $.ajax({
                 url:"/members/"+ inventoryId + "/add/book/"+bookId,
                 type: "GET",
                 success:function (response) {
-                    alert("서재에 담았습니다 :"+response);
+                    alert(response);
+                    var count =/*[[ ${book.addCount} ]]*/;
+                    $("#addCount").text(count+1);
+                },
+                error:function (e) {//jqXHR
+                    alert(e.status+e.statusText+' : ' +e.responseText );
                 }
             });
+            /* ]]> */
         }
 
     </script>
