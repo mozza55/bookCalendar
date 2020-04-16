@@ -13,8 +13,8 @@ public class Bestbook {
     @Id @GeneratedValue
     @Column(name = "Bestbook_id")
     private Long id;
-
-    private LocalDate period;
+    private int groupBy;
+    private LocalDate date;
     private int rank;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,8 +26,9 @@ public class Bestbook {
     public Bestbook() {
     }
 
-    public Bestbook(LocalDate period, int rank, Book book, int score ) {
-        this.period = period;
+    public Bestbook(LocalDate date, int groupBy, int rank , Book book, int score ) {
+        this.date = date;
+        this.groupBy=groupBy;
         this.rank = rank;
         this.score = score;
         this.book = book;

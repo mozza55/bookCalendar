@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface InventoryBookRepositoryCustom {
 
-    List<BookScoreDto> getBookAddScoreOn(LocalDate localDate);
-    List<BookScoreDto> getBookReadScoreOn(LocalDate localDate);
+    List<BookScoreDto> getBookAddScoreOn(LocalDate from, LocalDate to);
+    List<BookScoreDto> getBookReadScoreOn(LocalDate from, LocalDate to);
 }

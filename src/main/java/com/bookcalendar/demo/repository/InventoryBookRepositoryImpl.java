@@ -21,11 +21,11 @@ public class InventoryBookRepositoryImpl
     }
 
     @Override
-    public List<BookScoreDto> getBookAddScoreOn(LocalDate localDate) {
+    public List<BookScoreDto> getBookAddScoreOn(LocalDate from, LocalDate to) {
         QInventoryBook inventoryBook = QInventoryBook.inventoryBook;
         List<BookScoreDto> bookScoreDtos = from(inventoryBook).select(Projections.constructor(BookScoreDto.class,
                 inventoryBook.book.id, SQLExpressions.count(inventoryBook.book.id)))
-                .where(inventoryBook.addDate.eq(localDate))
+                .where(inventoryBook.addDate.between(from,to))
                 .groupBy(inventoryBook.book.id)
                 .fetch();
 
@@ -33,11 +33,11 @@ public class InventoryBookRepositoryImpl
     }
 
     @Override
-    public List<BookScoreDto> getBookReadScoreOn(LocalDate localDate) {
+    public List<BookScoreDto> getBookReadScoreOn(LocalDate from, LocalDate to) {
         QInventoryBook inventoryBook = QInventoryBook.inventoryBook;
         List<BookScoreDto> bookScoreDtos = from(inventoryBook).select(Projections.constructor(BookScoreDto.class,
                 inventoryBook.book.id, SQLExpressions.count(inventoryBook.book.id)))
-                .where(inventoryBook.readDate.eq(localDate))
+                .where(inventoryBook.readDate.between(from,to))
                 .groupBy(inventoryBook.book.id)
                 .fetch();
 

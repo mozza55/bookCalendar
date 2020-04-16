@@ -1,0 +1,175 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/book_layout">
+
+<style layout:fragment="content_css">
+    .pagination{
+        width: fit-content;
+        margin: auto;
+    }
+    .pagination a{
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+    .pagination li.active a{
+        background-color: #866ec7;
+        color: white;
+    }
+    .search_by{
+        padding-top: 15px;
+    }
+    .group_tab{
+        text-align: right;
+        display: block;
+        margin-top: 3px;
+        height: 10px;
+    }
+    .group_tab ul{
+        display: inline-flex;
+        padding-inline-start: 0px;
+        list-style: none;
+        margin-bottom: 0px;
+        font-size: 18px;
+    }
+    .group_tab span{
+        padding-left: 5px;
+        padding-right: 5px;
+        color: #aeadac;
+    }
+    .group_tab .active span{
+        color: #866ec7;
+    }
+    .search_date select{
+        color: #808080;
+    }
+</style>
+
+<section layout:fragment="f-content">
+    <div class="group_tab" >
+        <ul class="t_main">
+            <li>
+                <a href="/books/bestseller" th:class="${groupBy == 1} ? 'active'"><span>월간 베스트</span></a>
+            </li>
+            <li><span>|</span></li>
+            <li>
+                <a href="/books/bestseller?groupBy=2" th:class="${groupBy == 2} ? 'active'"><span>주간 베스트</span></a>
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <table style="width: 100%">
+            <tr>
+                <td style="font:bold; color:#866ec7; font-size: 20px ">
+                    <span th:text="${groupBy ==1 ? '월간베스트 :' :'주간베스트 :'}"></span>
+                    <span th:text="${searchDate.year}+'년 '+${searchDate.month}+'월 '"></span>
+                    <span th:if="${groupBy==2}" th:text="${searchDate.week} +'주'"></span>
+                </td>
+            </tr>
+            <tr><td><span style="padding-left: 10px">읽은 횟수, 서재에 담은 횟수 기준으로 집계되었습니다</span></td></tr>
+            <tr>
+                <td style="text-align: right;">
+                    <div class="search_date" >
+                        <select id ="year" th:field="*{searchDate.year}">
+                            <option th:each="i : ${#numbers.sequence(2020,2018)}" th:value="${i}" th:text="${i}+' 년'"></option>
+                        </select>
+                        <select id ="month" th:field="*{searchDate.month}">
+                            <option th:each="i : ${#numbers.sequence(1,12)}" th:value="${i}" th:text="${i} +' 월'"></option>
+                        </select>
+                        <select id ="week" th:field="*{searchDate.week}" th:if="${groupBy==2}">
+                            <option th:each="i : ${#numbers.sequence(1,5)}" th:value="${i}" th:text="${i}+' 주'"></option>
+                        </select>
+                        <a href="javascript:bestseller();"><span>조회</span></a>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="div-liner">
+        <div style="height: 10px"></div>
+        <div style="border-top: 1px solid #ccc;"></div>
+        <div style="height: 10px"></div>
+    </div>
+    <!-- 결과 책 목록 -->
+    <table>
+        <div  class="bookblock" th:each="bestBook: ${bookList}">
+            <div>
+                <a th:href="@{/books/detail/{bookId}(bookId=${bestBook.book.id})}">
+                    <img src="/images/bookcover.jpeg" width="160">
+                </a>
+                <p class="bookinfo" th:text="${bestBook.book.title}"></p>
+                <p class="bookinfo" th:text="${bestBook.book.author}"></p>
+            </div>
+        </div>
+    </table>
+    <!-- 하단 페이징 -->
+    <nav class="navbar-pagination">
+        <ul class="pagination"
+            th:with="start=${bookList.number - 2 > 0 ? bookList.number - 2  : 0},
+                     max = ${bookList.totalPages==0 ? 0: bookList.totalPages-1},
+                     last=(${start + 4 < max ? start + 4 : max})">
+            <li>
+                <a th:href="${bookList.first} ? '#':'javascript:page_set(0);'" aria-label="First">
+                    <span aria-hidden="true">First</span>
+                </a>
+            </li>
+            <li th:class="${bookList.first} ? 'disabled'">
+                <a th:href="${bookList.first} ? '#' :'javascript:page_set('+ ${bookList.number-1} +');'" aria-label="Previous">
+                    <span aria-hidden="true">&lt;</span>
+                </a>
+            </li>
+            <li th:each="page: ${#numbers.sequence(start, last)}" th:class="${page == bookList.number} ? 'active'">
+                <a th:text="${page+1}" th:href="'javascript:page_set('+ ${page} +');'"></a>
+            </li>
+
+            <li>
+                <a th:href="${bookList.last} ? '#' : 'javascript:page_set('+ ${bookList.number+1} +');'" aria-label="Next">
+                    <span aria-hidden="true">&gt;</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="${bookList.last} ? '#':'javascript:page_set('+ ${bookList.totalPages-1} +');'" aria-label="Last">
+                    <span aria-hidden="true">Last</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</section>
+<th:block layout:fragment="content_js">
+    <script th:inline="javascript">
+        $(window).ready(function () {
+        });
+        function page_set(page) {
+            /*<![CDATA[*/
+            var groupBy = /*[[ ${groupBy} ]]*/;
+            var year = /*[[ ${searchDate.year} ]]*/;
+            var month = /*[[ ${searchDate.month} ]]*/;
+            var week = /*[[ ${searchDate.week} ]]*/;
+            var url = location.pathname +'?groupBy='+groupBy+'&page='+page+'&year='+year+'&month='+month;
+            if(groupBy==2){
+                url = url + '&week='+week;
+            }
+            location.href=url
+            /* ]]> */
+        }
+        function bestseller() {
+            /*<![CDATA[*/
+            var yearSel = document.getElementById("year");
+            var year = yearSel.options[yearSel.selectedIndex].value;
+            var monthSel = document.getElementById("month");
+            var month = monthSel.options[monthSel.selectedIndex].value;
+            var groupBy =/*[[ ${groupBy} ]]*/;
+            var url = location.pathname + '?groupBy='+groupBy+'&year=' + year + "&month=" + month;
+            if(groupBy== 2){
+                var weekSel = document.getElementById("week");
+                var week = weekSel.options[weekSel.selectedIndex].value;
+                url = url +"&week=" + week;
+            }
+            location.href=url;
+            /* ]]> */
+        }
+
+    </script>
+</th:block>

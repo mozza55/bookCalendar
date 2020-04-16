@@ -62,7 +62,8 @@
     <nav class="navbar-pagination">
         <ul class="pagination"
             th:with="start=${bookList.number - 2 > 0 ? bookList.number - 2  : 0},
-                     last=(${start + 4 < bookList.totalPages-1 ? start + 4 : (bookList.totalPages-1)})">
+                     max = ${bookList.totalPages==0 ? 0: bookList.totalPages-1},
+                     last=(${start + 4 < max ? start + 4 : max})">
             <li>
                 <a th:href="${bookList.first} ? '#':'javascript:page_set(0);'" aria-label="First">
                     <span aria-hidden="true">First</span>

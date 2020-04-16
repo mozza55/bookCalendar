@@ -1,11 +1,14 @@
 package com.bookcalendar.demo.controller;
 
+import com.bookcalendar.demo.domain.Bestbook;
 import com.bookcalendar.demo.domain.Book;
+import com.bookcalendar.demo.repository.BestbookRepository;
 import com.bookcalendar.demo.repository.BookRepository;
 import com.bookcalendar.demo.repository.BookScoreDto;
 import com.bookcalendar.demo.repository.BookSearch;
 import com.bookcalendar.demo.service.BestbookService;
 import com.bookcalendar.demo.service.BookService;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Controller
@@ -29,6 +33,7 @@ public class BookController {
     private final BookRepository bookRepository;
     private final BookService bookService;
     private final BestbookService bestbookService;
+    private final BestbookRepository bestbookRepository;
 
     @GetMapping("/books/create")
     public String createForm(Model model){
@@ -113,19 +118,49 @@ public class BookController {
     @GetMapping("/books/bestseller")
     public String searchBestBook(
             @RequestParam(defaultValue = "1") int groupBy,
-            @RequestParam(required = false) String year,
-            @RequestParam(required = false) String month,
-            @RequestParam(required = false) String week,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer week,
             @RequestParam(defaultValue = "0")int page,
                                  Model model){
         //groupBy == 1 월간 검색
         //groupBy == 2 주간 검색
         int size =3; //pagesize
-        Pageable pageable = PageRequest.of(page,size, Sort.Direction.DESC,"readCount");
-        Page<Book> searchList = bookRepository.findAll(pageable);
+        LocalDate date =LocalDate.now();
+        SearchDate searchDate;
+        if(month !=null) date = LocalDate.of(year,month,1);
+        if(week!=null){
+            switch (week) {
+                case 1: date =date.withDayOfMonth(1); break;
+                case 2: date =date.withDayOfMonth(8); break;
+                case 3: date =date.withDayOfMonth(15); break;
+                case 4: date =date.withDayOfMonth(22); break;
+                case 5: date =YearMonth.from(date).atEndOfMonth(); break;
+                default: break;
+            }
+            searchDate = new SearchDate(date.getYear(),date.getMonthValue(),week);
+        }else searchDate = new SearchDate(date.getYear(),date.getMonthValue(),(date.getDayOfMonth()-1)/7+1);
+        log.info("date : "+date);
+        Pageable pageable = PageRequest.of(page,size, Sort.Direction.DESC,"rank");
+        Page<Bestbook> searchList = bestbookService.getBestBook(date,groupBy,pageable);
         model.addAttribute("bookList",searchList);
         model.addAttribute("bookSearch",new BookSearch());
-        return "books/bestList";
+        model.addAttribute("groupBy",groupBy);
+        model.addAttribute("searchDate",searchDate);
+        return "books/bestseller";
+    }
+
+    @Data
+    static class SearchDate{
+        private int year;
+        private int month;
+        private int week;
+
+        public SearchDate(int year, int month, int week) {
+            this.year = year;
+            this.month = month;
+            this.week = week;
+        }
     }
     @PostMapping("/books/test")
     @ResponseBody
@@ -137,7 +172,8 @@ public class BookController {
 
     @GetMapping("/books/best")
     @ResponseBody
-    public List<BookScoreDto> getBestbook(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localDate){
-        return bestbookService.getBestBookList(localDate);
+    public List<BookScoreDto> getBestbook(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localDate,
+                                          @RequestParam(defaultValue = "1") int groupBy){
+        return bestbookService.setBestbook(localDate,groupBy);
     }
 }
