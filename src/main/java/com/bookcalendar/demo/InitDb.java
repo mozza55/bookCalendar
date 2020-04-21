@@ -2,10 +2,10 @@ package com.bookcalendar.demo;
 
 
 import com.bookcalendar.demo.domain.Book;
+import com.bookcalendar.demo.domain.Event;
+import com.bookcalendar.demo.domain.InventoryBook;
 import com.bookcalendar.demo.domain.Member;
-import com.bookcalendar.demo.repository.BookRepository;
-import com.bookcalendar.demo.repository.InventoryRepository;
-import com.bookcalendar.demo.repository.MemberRepository;
+import com.bookcalendar.demo.repository.*;
 import com.bookcalendar.demo.service.InventoryService;
 import com.bookcalendar.demo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Component
@@ -33,6 +35,8 @@ public class InitDb {
         private final MemberService memberService;
         private final InventoryService inventoryService;
         private final BookRepository bookRepository;
+        private final InventoryBookRepository inventoryBookRepository;
+        private final EventRepository eventRepository;
         public void dbInit1(){
             Member member1 = Member.createMember("aaa", "1234", "김망고", "망고");
             memberService.join(member1);
@@ -54,9 +58,13 @@ public class InitDb {
             Book book5 = Book.createBook("진이, 지니","정유정","은행나무","9791189982140",388);
             bookRepository.save(book5);
 
-            inventoryService.addBook(member1.getInventory().getId(), book3.getId());
+            Long inventoryBookId = inventoryService.addBook(member1.getInventory().getId(), book3.getId());
             inventoryService.addBook(member1.getInventory().getId(), book2.getId());
             inventoryService.addBook(member2.getInventory().getId(), book3.getId());
+
+            InventoryBook ib1 = inventoryBookRepository.getOne(inventoryBookId);
+            Event event1 = Event.createEvent(member1.getCalendar(),ib1, LocalDate.now(), LocalDateTime.now(), LocalDateTime.now().plusHours(1L));
+            eventRepository.save(event1);
         }
 
     }

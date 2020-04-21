@@ -46,7 +46,7 @@ public class Member {
     }
 
     //연관 관계 편의 메서드
-    public void setCalenar(Calendar calendar){
+    public void setCalendar(Calendar calendar){
         this.calendar = calendar;
         calendar.setMember(this);
     }

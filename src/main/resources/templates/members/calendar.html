@@ -3,29 +3,196 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="layout/main_layout">
 <th:block layout:fragment="custom_css">
+
     <link href='/fullcalendar/core/main.css' rel='stylesheet' />
     <link href='/fullcalendar/daygrid/main.css' rel='stylesheet' />
 
     <script src='/fullcalendar/core/main.js'></script>
     <script src='/fullcalendar/daygrid/main.js'></script>
+    <script src='/fullcalendar/interaction/main.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.0/moment.min.js"></script>
+
+    <!--jQuery UI CSS파일-->
+    <link rel="stylesheet" href="/webjars/jquery-ui/1.12.1/jquery-ui.css">
+    <script src="/webjars/jquery-ui/1.12.1/jquery-ui.js"></script>
+
+    <script src="/js/datedropper.pro.min.js"></script>
+    <script src="/js/timedropper.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/timedropper.css">
 
 </th:block>
+<style layout:fragment="content_css">
+    div.datedropper.my-style {
+        --dd-color1: #a993c7;
+        --dd-color2: #fff;
+        --dd-color3: #4D4D4D;
+        --dd-color4: #FFF;
+        --dd-radius: 8px;
+        --dd-width: 171px;
+        --dd-shadow: 0 0 32px 0px rgba(0, 0, 0, 0);
+    }
+</style>
 <th:block layout:fragment="custom_js">
-    <script>
-
+    <script th:inline="javascript" >
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                plugins: [ 'dayGrid' ]
+                plugins: [ 'dayGrid','interaction' ],
+                defaultView: 'dayGridMonth',
+                selectable: true,
+                eventSources:[
+                    {
+                        url:'/calendar/2/events',
+                        method:'GET',
+                        textColor:'white'
+                    }
+                ],
+                dateClick: function(info){
+                    var startDate = moment(info.date).format("YYYY-MM-DD");
+                    var d = moment(info.date).date();
+                    var m = moment(info.date).month()+1;
+                    var y= moment(info.date).year();
+                    $("#startDate").val(startDate);
+                    $("#startDate").dateDropper('setDate',{ d: d, m: m, y: y });
+                    $("#createEventModal").modal("show");
+
+                },
+                eventClick: function (info) {
+                    $("#getEventModal").modal("show");
+
+                }
+            });
+
+            $(function() {
+
+                $("#startTime").timeDropper({
+                    mousewheel : true
+                });
+                $("#endTime").timeDropper({
+                    mousewheel : true
+                });
+                $('#startDate').dateDropper({
+                    autofill: true,
+                    theme: 'my-style',
+                    format: 'Y-m-d',
+                    lang: 'ko',
+                    //large : true,
+                    startFromMonday: false,
+                    largeOnly: true
+                });
             });
 
             calendar.render();
+
+            $('#createEvent-form').on('submit',function (e) {
+                e.preventDefault();
+                $("#createEventModal").modal("hide");
+                var date = $("#startDate").val();
+                var sTime = $("#startTime").val();
+                var eTime = $("#endTime").val().split(" ");
+                var start = moment(date+sTime,"YYYY-MM-DDTHH:mm").format('YYYY-MM-DDTHH:mm');
+                var end = moment(date+eTime,"YYYY-MM-DDTHH:mm").format('YYYY-MM-DDTHH:mm');
+                console.log(end);
+                saveEvent(date,start, end);
+
+                calendar.addEvent(
+                    {
+                        title:$("#bookTitle option:selected").text(),
+                        start:start,
+                        end:end,
+                        textColor: 'white',
+                    });
+
+            });
+
+            $('#getEventModal').on('submit',function (e) {
+                alert("ggg");
+            });
         });
 
+
+        function saveEvent(date,start,end) {
+            /*<![CDATA[*/
+            var calendarId= /*[[${session.member.calendar.id}]]*/;
+            var inventoryBookId = $("#bookTitle").val();
+            $.ajax({
+                type:'POST',
+                url: '/calendar/'+calendarId+'/events/create',
+                data:{
+                    inventoryBookId: inventoryBookId,
+                    date: date,
+                    start: start,
+                    end: end
+                },
+                success:function (response){
+                    Swal.fire('독서 기록을 추가했습니다!','','success');
+                }
+            });
+            /* ]]> */
+        }
     </script>
 </th:block>
 <section layout:fragment="f-content">
     <div id='calendar'></div>
+    <!-- Modal -->
+    <div class="modal fade" id="createEventModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEventModalLabel">독서 기록 추가하기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form role="form" id="createEvent-form" >
+                    <div class="modal-body">
+                            <div class="form-group">
+                                <label for="bookTitle" class="col-form-label">책</label>
+                                <select id ="bookTitle" type="text" class="form-control" >
+                                    <option th:each="inventoryBook : ${bookList}" th:value="${inventoryBook.id}" th:text="${inventoryBook.book.title}"></option>
+                                </select>
+                            </div>
+                        <div style="display: inline-flex; ">
+                            <div class="form-group" style="width: 30%; padding-right: 10px">
+                                <label for="startDate" class="col-form-label">날짜 </label>
+                                <input type="text" class="form-control" id="startDate" >
+                            </div>
+                            <div class="form-group" style="width: 25%; padding-right: 10px">
+                                <label for="startTime" class="col-form-label">시작 시간 </label>
+                                <input type="text" class="form-control" id="startTime" >
+                            </div>
+                            <div class="form-group" style="width: 25%">
+                                <label for="endTime" class="col-form-label">종료 시간 </label>
+                                <input type="text" class="form-control" id="endTime" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">독서 기록 추가</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="getEventModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="getEventModalLabel">독서 기록</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">독서 기록 삭제</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </section>
 

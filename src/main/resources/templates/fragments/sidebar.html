@@ -17,6 +17,9 @@
                 <a href="/books">Book</a>
             </li>
             <li>
+                <a th:href="@{/calendar/{calendarId} (calendarId=${session.member.calendar.id})}" th:unless="${session.member == null}">Calendar</a>
+            </li>
+            <li>
                 <a th:href="@{/members/inventory/{inventoryId}(inventoryId=${session.member.inventory.id})}" th:unless="${session.member == null}">My Books</a>
             </li>
             <li>

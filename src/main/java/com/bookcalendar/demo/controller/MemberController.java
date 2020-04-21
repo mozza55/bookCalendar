@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -115,9 +116,6 @@ public class MemberController {
         return "inventories/inventory";
     }
 
-    @GetMapping("/members/calendar")
-    public String getCalendar(){
-        return "members/calendar";
-    }
+
 
 }

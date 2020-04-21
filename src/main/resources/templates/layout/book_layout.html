@@ -3,6 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
     <head>
         <th:block th:include="fragments/header"></th:block>
+        <th:block th:replace="fragments/script :: script" />
         <link rel="stylesheet" th:href="@{/css/book/book.css}"/>
         <style layout:fragment="content_css"></style>
     </head>
@@ -16,7 +17,8 @@
                 <section layout:fragment="f-content"> </section>
             </div>
         </div>
-        <th:block th:replace="fragments/script :: script" />
+
         <th:block layout:fragment="content_js"></th:block>
+        <script src="/js/main.js"></script>
     </body>
 </html>

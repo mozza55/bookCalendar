@@ -28,4 +28,13 @@ public class Event {
     private int startPage;
     private int endPage;
 
+    public static Event createEvent(Calendar c, InventoryBook ib, LocalDate date,LocalDateTime startTime, LocalDateTime endTime ){
+        Event e = new Event();
+        e.calendar = c;
+        e.inventoryBook = ib;
+        e.date = date;
+        e.startTime = startTime;
+        e.endTime = endTime;
+        return e;
+    }
 }

@@ -16,12 +16,13 @@ public interface InventoryBookRepository  extends JpaRepository<InventoryBook,Lo
 
     List<InventoryBook> findByInventoryIdAndBookId(Long inventoryId, Long BookId);
 
-    @Query("select ib from InventoryBook ib join fetch ib.book b where ib.inventory.id = ?1")
-    List<InventoryBook> findByInventoryIdWithBook(Long inventoryId);
-
     @EntityGraph(attributePaths ="book")
     @Query("select ib from InventoryBook ib where ib.inventory.id = ?1")
     Page<InventoryBook> findByInventoryIdWithBook(Long inventoryId, Pageable pageable);
+
+    @EntityGraph(attributePaths ="book")
+    @Query("select ib from InventoryBook ib where ib.inventory.id = ?1")
+    List<InventoryBook> findByInventoryIdWithBook(Long inventoryId);
 
 
 }
