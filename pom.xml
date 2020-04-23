@@ -79,11 +79,6 @@
             <artifactId>jquery</artifactId>
             <version>3.3.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>popper.js</artifactId>
-            <version>1.15.0</version>
-        </dependency>
 
 
         <!-- QueryDSL-->
@@ -125,6 +120,14 @@
             <artifactId>momentjs</artifactId>
             <version>2.24.0</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.webjars/bootstrap-slider -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap-slider</artifactId>
+            <version>10.0.2</version>
+        </dependency>
+
 
 
     </dependencies>

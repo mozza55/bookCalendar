@@ -3,6 +3,7 @@ package com.bookcalendar.demo.repository;
 import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.domain.InventoryBook;
 import com.bookcalendar.demo.domain.QInventoryBook;
+import com.bookcalendar.demo.dto.InventoryBookDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -42,5 +43,15 @@ public class InventoryBookRepositoryImpl
                 .fetch();
 
         return bookScoreDtos;
+    }
+
+    @Override
+    public List<InventoryBookDto> getDtosByInventoryId(Long inventoryId) {
+        QInventoryBook inventoryBook = QInventoryBook.inventoryBook;
+        List<InventoryBookDto> inventoryBookDtoList = from(inventoryBook).select(Projections.constructor(InventoryBookDto.class,
+                inventoryBook, inventoryBook.book))
+                .where(inventoryBook.inventory.id.eq(inventoryId))
+                .fetch();
+        return inventoryBookDtoList;
     }
 }

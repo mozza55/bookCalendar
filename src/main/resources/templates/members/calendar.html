@@ -16,10 +16,14 @@
     <!--jQuery UI CSS파일-->
     <link rel="stylesheet" href="/webjars/jquery-ui/1.12.1/jquery-ui.css">
     <script src="/webjars/jquery-ui/1.12.1/jquery-ui.js"></script>
+    <script>$.fn.slider = null</script>
 
     <script src="/js/datedropper.pro.min.js"></script>
     <script src="/js/timedropper.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/timedropper.css">
+
+    <script src="/webjars/bootstrap-slider/10.0.2/bootstrap-slider.js"></script>
+    <link rel="stylesheet" href="/webjars/bootstrap-slider/10.0.2/css/bootstrap-slider.css">
 
 </th:block>
 <style layout:fragment="content_css">
@@ -35,6 +39,7 @@
 </style>
 <th:block layout:fragment="custom_js">
     <script th:inline="javascript" >
+        var bookList= /*[[${bookList}]]*/;
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
 
@@ -68,6 +73,15 @@
             });
 
             $(function() {
+                $('[data-toggle="tooltip"]').tooltip()
+                $("#page-slider").slider({
+
+                });
+                $("#page-slider").on("slide", function(slideEvt) {
+                    $("#pageSliderStartVal").text(slideEvt.value[0]);
+                    $("#pageSliderEndVal").text(slideEvt.value[1]);
+                });
+
 
                 $("#startTime").timeDropper({
                     mousewheel : true
@@ -110,7 +124,11 @@
 
             });
             $('#bookTitle').change(function(){
-                $('#bookTitle').val();
+                var index =$("#bookTitle").val();
+                console.log('변화');
+                $("#page-slider").slider({
+                    value: bookList[index].currentPage
+                });
             })
 
             $('#deleteEvent-btn').click(function (e) {
@@ -138,14 +156,11 @@
             /* ]]> */
 
         }
-        function saveEvent(date,start,end) {
-            /*<![CDATA[*/
-            var calendarId= /*[[${session.member.calendar.id}]]*/;
-            var bookList = /*[[${bookList.get(1).}]]*/;
-            var i =$("#bookTitle").val()['id'];
-            console.log('wow'+bookList);
-            var inventoryBookId = 0;
 
+        function saveEvent(date,start,end) {
+            var calendarId= /*[[${session.member.calendar.id}]]*/;
+            var index =$("#bookTitle").val();
+            var inventoryBookId = bookList[index].inventoryBookId;
             var eventId="";
             $.ajax({
                 type:'POST',
@@ -163,7 +178,6 @@
                 }
             });
             return eventId;
-            /* ]]> */
         }
     </script>
 </th:block>
@@ -184,7 +198,7 @@
                         <div class="form-group">
                             <label for="bookTitle" class="col-form-label">책</label>
                             <select id ="bookTitle" type="text" class="form-control" >
-                                <option th:each="inventoryBook : ${bookList}" th:value="${inventoryBook}" th:text="${inventoryBook.book.title}"></option>
+                                <option th:each="inventoryBook, iter : ${bookList}" th:value="${iter.index}" th:text="${inventoryBook.title}"></option>
                             </select>
                         </div>
                         <div style="display: inline-flex; ">
@@ -202,7 +216,9 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <input id="page" type="text" class="form-control" value="" data-slider-min="0" data-slider-max="1000" data-slider-step="5" data-slider-value="[250,450]"/>
+                            <input id="page-slider" type="text" class="span2" value="" data-slider-min="10" data-slider-max="1000" data-slider-step="5" data-slider-value="[250,450]"/>
+                            <span style="width: 80px;" id="pageSliderStartValLabel"> <span id="pageSliderStartVal"></span></span>
+                            <span style="width: 80px;" id="pageSliderEndValLabel"> ~ <span id="pageSliderEndVal"></span></span>
                         </div>
                     </div>
                     <div class="modal-footer">
