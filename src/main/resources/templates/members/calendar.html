@@ -61,6 +61,8 @@
                 },
                 eventClick: function (info) {
                     $("#getEventModal").modal("show");
+                    $("#eventBookTitle").text(info.event.title);
+                    $("#eventBookTitle").val(info.event.id);
 
                 }
             });
@@ -94,11 +96,12 @@
                 var eTime = $("#endTime").val().split(" ");
                 var start = moment(date+sTime,"YYYY-MM-DDTHH:mm").format('YYYY-MM-DDTHH:mm');
                 var end = moment(date+eTime,"YYYY-MM-DDTHH:mm").format('YYYY-MM-DDTHH:mm');
-                console.log(end);
-                saveEvent(date,start, end);
 
+                var eventId = saveEvent(date,start, end);
+                console.log("eventId :",eventId);
                 calendar.addEvent(
                     {
+                        id : eventId,
                         title:$("#bookTitle option:selected").text(),
                         start:start,
                         end:end,
@@ -106,30 +109,60 @@
                     });
 
             });
+            $('#bookTitle').change(function(){
+                $('#bookTitle').val();
+            })
 
-            $('#getEventModal').on('submit',function (e) {
-                alert("ggg");
+            $('#deleteEvent-btn').click(function (e) {
+                $("#getEventModal").modal("hide");
+                e.preventDefault();
+                //alert($("#eventBookTitle").val());
+                var eventId =$("#eventBookTitle").val();
+                var event = calendar.getEventById(eventId);
+                event.remove();
+                deleteEvent(eventId);
             });
         });
 
+        function deleteEvent(eventId) {
+            /*<![CDATA[*/
+            var calendarId= /*[[${session.member.calendar.id}]]*/;
+            $.ajax({
+                type:'DELETE',
+                url: '/calendar/'+calendarId+'/events/'+eventId,
+                async:false,
+                success:function (response){
+                    Swal.fire('독서 기록을 삭제했습니다','','success');
+                }
+            });
+            /* ]]> */
 
+        }
         function saveEvent(date,start,end) {
             /*<![CDATA[*/
             var calendarId= /*[[${session.member.calendar.id}]]*/;
-            var inventoryBookId = $("#bookTitle").val();
+            var bookList = /*[[${bookList.get(1).}]]*/;
+            var i =$("#bookTitle").val()['id'];
+            console.log('wow'+bookList);
+            var inventoryBookId = 0;
+
+            var eventId="";
             $.ajax({
                 type:'POST',
-                url: '/calendar/'+calendarId+'/events/create',
+                url: '/calendar/'+calendarId+'/events',
+                async:false,
                 data:{
                     inventoryBookId: inventoryBookId,
                     date: date,
                     start: start,
                     end: end
                 },
-                success:function (response){
-                    Swal.fire('독서 기록을 추가했습니다!','','success');
+                success:function (result){
+                    Swal.fire('독서 기록을 추가했습니다!',result,'success');
+                    eventId=result;
                 }
             });
+            return eventId;
             /* ]]> */
         }
     </script>
@@ -148,12 +181,12 @@
                 </div>
                 <form role="form" id="createEvent-form" >
                     <div class="modal-body">
-                            <div class="form-group">
-                                <label for="bookTitle" class="col-form-label">책</label>
-                                <select id ="bookTitle" type="text" class="form-control" >
-                                    <option th:each="inventoryBook : ${bookList}" th:value="${inventoryBook.id}" th:text="${inventoryBook.book.title}"></option>
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label for="bookTitle" class="col-form-label">책</label>
+                            <select id ="bookTitle" type="text" class="form-control" >
+                                <option th:each="inventoryBook : ${bookList}" th:value="${inventoryBook}" th:text="${inventoryBook.book.title}"></option>
+                            </select>
+                        </div>
                         <div style="display: inline-flex; ">
                             <div class="form-group" style="width: 30%; padding-right: 10px">
                                 <label for="startDate" class="col-form-label">날짜 </label>
@@ -167,6 +200,9 @@
                                 <label for="endTime" class="col-form-label">종료 시간 </label>
                                 <input type="text" class="form-control" id="endTime" >
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <input id="page" type="text" class="form-control" value="" data-slider-min="0" data-slider-max="1000" data-slider-step="5" data-slider-value="[250,450]"/>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -186,8 +222,15 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <div class="modal-body">
+                    <div>
+                        <table>
+                            <text id="eventBookTitle"></text>
+                        </table>
+                    </div>
+                </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-secondary">독서 기록 삭제</button>
+                    <button id="deleteEvent-btn" type="submit" class="btn btn-secondary">독서 기록 삭제</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
                 </form>

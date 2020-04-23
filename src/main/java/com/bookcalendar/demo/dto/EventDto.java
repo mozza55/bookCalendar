@@ -26,11 +26,13 @@ public class EventDto {
     @Data
     public class ExtendedProps{
         Long  inventoryBookId;
-        int page;
+        int startPage;
+        int endPage;
 
         public ExtendedProps(Long inventoryBookId) {
             this.inventoryBookId = inventoryBookId;
-            this.page=0;
+            this.startPage=0;
+            this.endPage=0;
         }
     }
 }

@@ -9,6 +9,8 @@ import com.bookcalendar.demo.repository.InventoryBookRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +47,7 @@ public class CalendarController {
         return eventRepository.getDtoByCalendarId(calendarId);
 
     }
-    @PostMapping("/calendar/{calendarId}/events/create")
+    @PostMapping("/calendar/{calendarId}/events")
     @ResponseBody
     public String createEvent(@PathVariable Long calendarId,
                               HttpSession session,
@@ -53,7 +55,7 @@ public class CalendarController {
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")LocalDateTime start,
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")LocalDateTime end){
-        log.info("calendarid: ",calendarId);
+        log.info("calendarid: "+calendarId);
         Member member =(Member) session.getAttribute("member");
 
         Event event = Event.createEvent(member.getCalendar(),
@@ -61,5 +63,14 @@ public class CalendarController {
                 date, start,end);
         eventRepository.save(event);
         return event.getId().toString();
+    }
+
+    @DeleteMapping("/calendar/{calendarId}/events/{eventId}")
+    @ResponseBody
+    public ResponseEntity<String> deleteEvent(@PathVariable Long calendarId,
+                                      @PathVariable Long eventId){
+        log.info("eventId:" +eventId);
+        eventRepository.deleteById(eventId);
+        return new ResponseEntity<>("sucess", HttpStatus.OK);
     }
 }
