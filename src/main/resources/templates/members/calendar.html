@@ -36,10 +36,15 @@
         --dd-width: 171px;
         --dd-shadow: 0 0 32px 0px rgba(0, 0, 0, 0);
     }
+    .tooltip.in {
+        opacity: 0.5;
+    }
 </style>
 <th:block layout:fragment="custom_js">
     <script th:inline="javascript" >
         var bookList= /*[[${bookList}]]*/;
+        var sliderMin =0;
+        var sliderMax =0;
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
 
@@ -61,8 +66,8 @@
                     var y= moment(info.date).year();
                     $("#startDate").val(startDate);
                     $("#startDate").dateDropper('setDate',{ d: d, m: m, y: y });
+                    setPageSlider(0);
                     $("#createEventModal").modal("show");
-
                 },
                 eventClick: function (info) {
                     $("#getEventModal").modal("show");
@@ -75,13 +80,14 @@
             $(function() {
                 $('[data-toggle="tooltip"]').tooltip()
                 $("#page-slider").slider({
-
+                    min: 0,
+                    max: sliderMax,
+                    value: 0,
+                    focus: true,
+                    formatter: function(value){
+                        return value+'p';
+                    }
                 });
-                $("#page-slider").on("slide", function(slideEvt) {
-                    $("#pageSliderStartVal").text(slideEvt.value[0]);
-                    $("#pageSliderEndVal").text(slideEvt.value[1]);
-                });
-
 
                 $("#startTime").timeDropper({
                     mousewheel : true
@@ -101,7 +107,27 @@
             });
 
             calendar.render();
+            $("#page-slider").on("slide", function(obj) {
+                //$("#pageSliderStartVal").text(slideEvt.value);
+                if(obj.value <sliderMin){
+                    $("#page-slider").slider('setValue',sliderMin);
+                }else{
+                    $("#pageSliderEndVal").val(obj.value);
+                }
+            });
+            $("#pageSliderEndVal").change(function () {
+                var pageVal = $("#pageSliderEndVal").val();
+                if(pageVal <sliderMin){
+                    $("#pageSliderEndVal").val(sliderMin);
+                }else if(pageVal >sliderMax){
+                    $("#pageSliderEndVal").val(sliderMax);
+                    $("#page-slider").slider('setValue', sliderMax);
+                }
+                else{
+                    $("#page-slider").slider('setValue', pageVal);
+                }
 
+            })
             $('#createEvent-form').on('submit',function (e) {
                 e.preventDefault();
                 $("#createEventModal").modal("hide");
@@ -120,15 +146,14 @@
                         start:start,
                         end:end,
                         textColor: 'white',
+
                     });
 
             });
             $('#bookTitle').change(function(){
                 var index =$("#bookTitle").val();
-                console.log('변화');
-                $("#page-slider").slider({
-                    value: bookList[index].currentPage
-                });
+                console.log("page :",bookList[index].currentPage,"~",bookList[index].page );
+                setPageSlider(index);
             })
 
             $('#deleteEvent-btn').click(function (e) {
@@ -141,6 +166,14 @@
                 deleteEvent(eventId);
             });
         });
+        function setPageSlider(index){
+            sliderMin = bookList[index].currentPage+1;
+            sliderMax = bookList[index].page;
+            $("#page-slider").data('slider').options.max = bookList[index].page;
+            $("#page-slider").slider('setValue',sliderMin );
+            $("#pageSliderStartVal").text(sliderMin);
+            $("#pageSliderEndVal").val(sliderMin);
+        }
 
         function deleteEvent(eventId) {
             /*<![CDATA[*/
@@ -170,7 +203,7 @@
                     inventoryBookId: inventoryBookId,
                     date: date,
                     start: start,
-                    end: end
+                    end: end,
                 },
                 success:function (result){
                     Swal.fire('독서 기록을 추가했습니다!',result,'success');
@@ -216,9 +249,10 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <input id="page-slider" type="text" class="span2" value="" data-slider-min="10" data-slider-max="1000" data-slider-step="5" data-slider-value="[250,450]"/>
-                            <span style="width: 80px;" id="pageSliderStartValLabel"> <span id="pageSliderStartVal"></span></span>
-                            <span style="width: 80px;" id="pageSliderEndValLabel"> ~ <span id="pageSliderEndVal"></span></span>
+                            <label for="page-slider" class="col-form-label"  style="margin-right: 20px;">페이지 </label>
+                            <input id="page-slider" type="text"/>
+                            <span style="width: 80px; margin-left: 20px;" id="pageSliderStartValLabel"> <span id="pageSliderStartVal">p</span></span>
+                            <span style="width: 80px;" id="pageSliderEndValLabel"> ~ <input style="width: 40px" type="text" id="pageSliderEndVal">p</input></span>
                         </div>
                     </div>
                     <div class="modal-footer">
