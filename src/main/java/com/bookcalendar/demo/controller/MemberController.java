@@ -3,6 +3,7 @@ package com.bookcalendar.demo.controller;
 import com.bookcalendar.demo.domain.Inventory;
 import com.bookcalendar.demo.domain.InventoryBook;
 import com.bookcalendar.demo.domain.Member;
+import com.bookcalendar.demo.dto.InventoryBookDto;
 import com.bookcalendar.demo.repository.InventoryBookRepository;
 import com.bookcalendar.demo.repository.InventoryRepository;
 import com.bookcalendar.demo.service.InventoryService;
@@ -110,7 +111,7 @@ public class MemberController {
         //log.info("=========="+findInventory.getInventoryBooks().size()); //초기화 안되이있어서 오류터짐
 
         Inventory inventory = inventoryRepository.findById(inventoryId).get();
-        Page<InventoryBook> inventoryBookList = inventoryBookRepository.findByInventoryIdWithBook(inventoryId,pageable);
+        Page<InventoryBookDto> inventoryBookList = inventoryBookRepository.getDtosByInventoryId(inventoryId,pageable);
         model.addAttribute("inventory",inventory);
         model.addAttribute("bookList",inventoryBookList);
         return "inventories/inventory";

@@ -7,8 +7,12 @@ import com.bookcalendar.demo.dto.InventoryBookDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.sql.SQLExpressions;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.time.LocalDate;
@@ -53,5 +57,18 @@ public class InventoryBookRepositoryImpl
                 .where(inventoryBook.inventory.id.eq(inventoryId))
                 .fetch();
         return inventoryBookDtoList;
+    }
+
+    @Override
+    public Page<InventoryBookDto> getDtosByInventoryId(Long inventoryId, Pageable pageable) {
+        QInventoryBook inventoryBook = QInventoryBook.inventoryBook;
+        JPQLQuery<InventoryBookDto> query = from(inventoryBook).select(Projections.constructor(InventoryBookDto.class,
+                inventoryBook, inventoryBook.book))
+                .where(inventoryBook.inventory.id.eq(inventoryId))
+                .distinct();
+
+        Long totalCount = query.fetchCount();
+        List<InventoryBookDto> results = getQuerydsl().applyPagination(pageable, query).fetch();
+        return new PageImpl<>(results,pageable,totalCount);
     }
 }

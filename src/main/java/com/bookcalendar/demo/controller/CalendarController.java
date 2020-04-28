@@ -7,6 +7,7 @@ import com.bookcalendar.demo.dto.EventDto;
 import com.bookcalendar.demo.dto.InventoryBookDto;
 import com.bookcalendar.demo.repository.EventRepository;
 import com.bookcalendar.demo.repository.InventoryBookRepository;
+import com.bookcalendar.demo.service.EventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +29,7 @@ public class CalendarController {
 
     private final InventoryBookRepository inventoryBookRepository;
     private final EventRepository eventRepository;
+    private final EventService eventService;
 
     @GetMapping("/calendar/{calendarId}")
     public String getCalendar(@PathVariable Long calendarId, HttpSession session, Model model){
@@ -59,20 +61,23 @@ public class CalendarController {
     }
     @PostMapping("/calendar/{calendarId}/events")
     @ResponseBody
-    public String createEvent(@PathVariable Long calendarId,
+    public Long createEvent(@PathVariable Long calendarId,
                               HttpSession session,
                               @RequestParam Long inventoryBookId,
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")LocalDateTime start,
-                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")LocalDateTime end){
-        log.info("calendarid: "+calendarId);
+                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")LocalDateTime end,
+                              @RequestParam int startPage, @RequestParam int endPage
+                              ){
         Member member =(Member) session.getAttribute("member");
 
         Event event = Event.createEvent(member.getCalendar(),
                 inventoryBookRepository.getOne(inventoryBookId),
-                date, start,end);
-        eventRepository.save(event);
-        return event.getId().toString();
+                date, start,end,startPage,endPage);
+        log.info("inventoryId: "+inventoryBookId);
+        log.info("endPage: "+event.getEndPage());
+        Long eventId = eventService.saveEventWithUpate(event, inventoryBookId,endPage);
+        return eventId;
     }
 
     @DeleteMapping("/calendar/{calendarId}/events/{eventId}")

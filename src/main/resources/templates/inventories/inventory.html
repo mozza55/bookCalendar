@@ -41,11 +41,11 @@
     <table>
         <div  class="bookblock" th:each="inventoryBook: ${bookList}">
             <div>
-                <a th:href="@{/books/detail/{bookId}(bookId=${inventoryBook.book.id})}">
+                <a th:href="@{/books/detail/{bookId}(bookId=${inventoryBook.bookId})}">
                     <img src="/images/bookcover.jpeg" width="160">
                 </a>
-                <p class="bookinfo" th:text="${inventoryBook.book.title}"></p>
-                <p class="bookinfo" th:text="${inventoryBook.book.author}"></p>
+                <p class="bookinfo" th:text="${inventoryBook.title}"></p>
+                <p class="bookinfo" th:text="${inventoryBook.author}"></p>
             </div>
         </div>
     </table>

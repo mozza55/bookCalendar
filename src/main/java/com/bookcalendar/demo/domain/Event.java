@@ -27,6 +27,7 @@ public class Event {
 
     private int startPage;
     private int endPage;
+    private String comment;
 
     public static Event createEvent(Calendar c, InventoryBook ib, LocalDate date,LocalDateTime startTime, LocalDateTime endTime ){
         Event e = new Event();
@@ -35,6 +36,17 @@ public class Event {
         e.date = date;
         e.startTime = startTime;
         e.endTime = endTime;
+        return e;
+    }
+    public static Event createEvent(Calendar c, InventoryBook ib, LocalDate date,LocalDateTime startTime, LocalDateTime endTime, int startPage, int endPage ){
+        Event e = new Event();
+        e.calendar = c;
+        e.inventoryBook = ib;
+        e.date = date;
+        e.startTime = startTime;
+        e.endTime = endTime;
+        e.startPage = startPage;
+        e.endPage = endPage;
         return e;
     }
 }

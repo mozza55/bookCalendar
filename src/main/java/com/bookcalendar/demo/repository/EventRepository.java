@@ -13,7 +13,7 @@ public interface EventRepository extends JpaRepository<Event,Long> {
 
     List<Event> findByCalendarId(Long calendarId);
 
-    @Query("select new com.bookcalendar.demo.dto.EventDto(e.id,e.inventoryBook.id, e.inventoryBook.book.title,e.startTime, e.endTime)" +
+    @Query("select new com.bookcalendar.demo.dto.EventDto(e.id,e.inventoryBook.id, e.inventoryBook.book.title,e.startTime, e.endTime,e.startPage, e.endPage,e.comment)" +
             " from Event e" +
             " where e.calendar.id = ?1 ")
     List<EventDto> getDtoByCalendarId(Long calendarId);

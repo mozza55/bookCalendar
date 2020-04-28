@@ -43,6 +43,7 @@
 <th:block layout:fragment="custom_js">
     <script th:inline="javascript" >
         var bookList= /*[[${bookList}]]*/;
+        var calendarId = /*[[${session.member.calendar.id}]]*/;
         var sliderMin =0;
         var sliderMax =0;
         document.addEventListener('DOMContentLoaded', function() {
@@ -54,7 +55,7 @@
                 selectable: true,
                 eventSources:[
                     {
-                        url:'/calendar/2/events',
+                        url:'/calendar/'+calendarId+'/events',
                         method:'GET',
                         textColor:'white'
                     }
@@ -67,25 +68,34 @@
                     $("#startDate").val(startDate);
                     $("#startDate").dateDropper('setDate',{ d: d, m: m, y: y });
                     setPageSlider(0);
+                    $('#bookTitle').val(0);
+                    $('#comment').val("");
                     $("#createEventModal").modal("show");
                 },
                 eventClick: function (info) {
                     $("#getEventModal").modal("show");
                     $("#eventBookTitle").text(info.event.title);
                     $("#eventBookTitle").val(info.event.id);
-
+                    $("#eventStartDate").text(moment(info.event.start).format("YYYY-MM-DD"));
+                    $("#eventStartTime").text(moment(info.event.start).format("HH:mm"));
+                    $("#eventEndTime").text(moment(info.event.end).format("HH:mm"));
+                    $("#eventComment").text(info.event.extendedProps.comment);
+                    $("#eventStartPage").text(info.event.extendedProps.startPage);
+                    $("#eventEndPage").text(info.event.extendedProps.endPage);
                 }
             });
 
             $(function() {
-                $('[data-toggle="tooltip"]').tooltip()
+
+                $('[data-toggle="tooltip"]').tooltip();
+
                 $("#page-slider").slider({
                     min: 0,
                     max: sliderMax,
-                    value: 0,
+                    value: [0,0],
                     focus: true,
                     formatter: function(value){
-                        return value+'p';
+                        return value[0]+'p ~ '+value[1]+'p';
                     }
                 });
 
@@ -109,11 +119,15 @@
             calendar.render();
             $("#page-slider").on("slide", function(obj) {
                 //$("#pageSliderStartVal").text(slideEvt.value);
+                $("#pageSliderStartVal").val(obj.value[0]);
+                $("#pageSliderEndVal").val(obj.value[1]);
+                /*
                 if(obj.value <sliderMin){
                     $("#page-slider").slider('setValue',sliderMin);
                 }else{
-                    $("#pageSliderEndVal").val(obj.value);
+
                 }
+                */
             });
             $("#pageSliderEndVal").change(function () {
                 var pageVal = $("#pageSliderEndVal").val();
@@ -135,20 +149,24 @@
                 var sTime = $("#startTime").val();
                 var eTime = $("#endTime").val().split(" ");
                 var start = moment(date+sTime,"YYYY-MM-DDTHH:mm").format('YYYY-MM-DDTHH:mm');
-                var end = moment(date+eTime,"YYYY-MM-DDTHH:mm").format('YYYY-MM-DDTHH:mm');
-
-                var eventId = saveEvent(date,start, end);
+                var end = moment(date+eTime,"YYYY-MM-DDTHH:mm:ss").format('YYYY-MM-DDTHH:mm');
+                console.log(start);
+                console.log('end:'+end);
+                var eventId = saveEvent(date,start,end);
                 console.log("eventId :",eventId);
                 calendar.addEvent(
                     {
                         id : eventId,
                         title:$("#bookTitle option:selected").text(),
-                        start:start,
-                        end:end,
+                        start: start,
+                        end: end+':01',
                         textColor: 'white',
-
+                        extendedProps:{
+                            startPage: $("#pageSliderStartVal").val(),
+                            endPage: $("#pageSliderEndVal").val(),
+                            comment : $("#comment").val()
+                        }
                     });
-
             });
             $('#bookTitle').change(function(){
                 var index =$("#bookTitle").val();
@@ -165,14 +183,19 @@
                 event.remove();
                 deleteEvent(eventId);
             });
+            $('input[type="text"]').keydown(function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                };
+            });
         });
         function setPageSlider(index){
-            sliderMin = bookList[index].currentPage+1;
+            sliderMin = bookList[index].currentPage;
             sliderMax = bookList[index].page;
             $("#page-slider").data('slider').options.max = bookList[index].page;
-            $("#page-slider").slider('setValue',sliderMin );
-            $("#pageSliderStartVal").text(sliderMin);
-            $("#pageSliderEndVal").val(sliderMin);
+            $("#page-slider").slider('setValue',[sliderMin,sliderMax]);
+            $("#pageSliderStartVal").val(sliderMin);
+            $("#pageSliderEndVal").val(sliderMax);
         }
 
         function deleteEvent(eventId) {
@@ -204,10 +227,14 @@
                     date: date,
                     start: start,
                     end: end,
+                    startPage: $("#pageSliderStartVal").val(),
+                    endPage: $("#pageSliderEndVal").val(),
+                    comment : $("#comment").val()
                 },
                 success:function (result){
                     Swal.fire('독서 기록을 추가했습니다!',result,'success');
                     eventId=result;
+                    bookList[index].currentPage = parseInt($("#pageSliderEndVal").val());
                 }
             });
             return eventId;
@@ -251,8 +278,12 @@
                         <div class="form-group">
                             <label for="page-slider" class="col-form-label"  style="margin-right: 20px;">페이지 </label>
                             <input id="page-slider" type="text"/>
-                            <span style="width: 80px; margin-left: 20px;" id="pageSliderStartValLabel"> <span id="pageSliderStartVal">p</span></span>
+                            <span style="width: 80px; margin-left: 20px;" id="pageSliderStartValLabel"> <input style="width: 40px"type="text" id="pageSliderStartVal">p</input></span>
                             <span style="width: 80px;" id="pageSliderEndValLabel"> ~ <input style="width: 40px" type="text" id="pageSliderEndVal">p</input></span>
+                        </div>
+                        <div class="form-group" >
+                            <label for="comment" class="col-form-label"  style=";margin-right: 20px;">코멘트 </label>
+                            <textarea id="comment" type="text" style=" width:200px;  height:100px;"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -273,10 +304,31 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div>
-                        <table>
-                            <text id="eventBookTitle"></text>
-                        </table>
+                    <div class="form-group">
+                        <label for="eventBookTitle" class="col-form-label">책</label>
+                        <span id ="eventBookTitle"></span>
+                    </div>
+                    <div style="display: inline-flex; width: 100% ">
+                        <div class="form-group" style="width: 30%; padding-right: 10px">
+                            <label for="eventStartDate" class="col-form-label">날짜 </label>
+                            <span class="form-control" id="eventStartDate" > </span>
+                        </div>
+                        <div class="form-group" style="width: 25%; padding-right: 10px">
+                            <label for="eventStartTime" class="col-form-label">시작 시간 </label>
+                            <span type="text" class="form-control" id="eventStartTime" ></span>
+                        </div>
+                        <div class="form-group" style="width: 25%">
+                            <label for="eventEndTime" class="col-form-label">종료 시간 </label>
+                            <span type="text" class="form-control" id="eventEndTime" ></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label"  style="margin-right: 20px;">페이지 </label>
+                        <span id="eventStartPage"></span> ~ <span id="eventEndPage"></span> p
+                    </div>
+                    <div class="form-group" >
+                        <label for="eventComment" class="col-form-label"  style=";margin-right: 20px;">코멘트 </label>
+                        <span id="eventComment" type="text" style=" width:200px;  height:100px;"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
