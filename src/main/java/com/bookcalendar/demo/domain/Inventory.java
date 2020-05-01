@@ -22,8 +22,12 @@ public class Inventory {
     private List<InventoryBook> inventoryBooks = new ArrayList<>();
 
     private int bookCount;
+    private int pagePerDay;
+    private int bookPerDay;
 
     public Inventory() {
+        bookPerDay=0;
+        pagePerDay=0;
         bookCount =0;
     }
 

@@ -2,6 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="layout/main_layout">
+<th:block layout:fragment="custom_css">
+    <link rel="stylesheet" th:href="@{/css/book/book.css}"/>
+    <script src="/webjars/chartjs/2.9.3/Chart.js"></script>
+</th:block>
 
 <style layout:fragment="content_css">
     .pagination{
@@ -26,10 +30,10 @@
     <div>
         <table>
             <tr>
-                <td><span th:text="산정기간" style="font:bold; color:#866ec7; font-size: 18px "></span>
+                <td><span style="font:bold; color:#866ec7; font-size: 18px ">My Books</span>
                 </td>
             </tr>
-            <tr><td><span>읽은 횟수, 서재에 담은 횟수 기준으로 집계되었습니다</span></td></tr>
+            <tr><td><canvas id="myChart" width="400" height="400"></canvas></td></tr>
         </table>
     </div>
     <div class="div-liner">
@@ -86,6 +90,42 @@
         function page_set(page) {
             location.href=location.pathname+'?page='+page
         }
-
+        var ctx = document.getElementById('myChart');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
     </script>
 </th:block>

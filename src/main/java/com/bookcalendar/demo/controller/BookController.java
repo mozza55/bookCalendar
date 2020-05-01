@@ -70,6 +70,7 @@ public class BookController {
 
         return "books/bookDetail";
     }
+
     @GetMapping("/books")
     public String getBookList(@PageableDefault(page = 1, size = 2, sort = "readCount",direction = Sort.Direction.DESC) Pageable pageable, Model model){
         Page<Book> bookList = bookService.getBookList(pageable);
@@ -173,6 +174,7 @@ public class BookController {
 
     @GetMapping("/books/best")
     @ResponseBody
+    //bestbook list를 산출해줌
     public List<BookScoreDto> getBestbook(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localDate,
                                           @RequestParam(defaultValue = "1") int groupBy){
         return bestbookService.setBestbook(localDate,groupBy);

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Service
@@ -48,6 +49,26 @@ public class InventoryService {
         InventoryBook savedBook = inventoryBookRepository.save(inventoryBook);
         return  savedBook.getId();
     }
+    @Transactional//책 담기
+    public Long addFinishedBook(Long inventoryId, Long bookId, int rating){
+        log.info("rating gg : "+rating);
+        //중복책 확인
+        validateDuplicateBook(inventoryId,bookId);
+        //책 추가
+        Book book = bookRepository.getOne(bookId);
+        book.addAddCount();
+        InventoryBook inventoryBook = InventoryBook.createInventoryBook(book);
+        Inventory inventory= inventoryRepository.getOne(inventoryId);
+        inventory.addBook(inventoryBook);
+        //
+        inventoryBook.finishInventoryBook();
+        inventoryBook.setRating(rating);
+        //
+        InventoryBook savedBook = inventoryBookRepository.save(inventoryBook);
+
+        return  savedBook.getId();
+    }
+
 
     public void validateDuplicateBook(Long inventoryId,Long bookId){
         if(inventoryBookRepository.findByInventoryIdAndBookId(inventoryId,bookId).size() !=0){
@@ -62,4 +83,10 @@ public class InventoryService {
         return  inventory.getId();
     }
 
+    @Transactional
+    public void updateRating(Long inventorybookId, Integer rating) {
+        InventoryBook inventoryBook = inventoryBookRepository.getOne(inventorybookId);
+        inventoryBook.finishInventoryBook();
+        inventoryBook.setRating(rating);
+    }
 }

@@ -29,6 +29,7 @@ public class InventoryBook {
     private int page;
     private LocalDate addDate;
     private LocalDate readDate;
+    private int rating;
     private String comment;
 
     //생성 메서드
@@ -39,13 +40,15 @@ public class InventoryBook {
         inventoryBook.setCurrentPage(0);
         inventoryBook.setStatus(ReadStatus.TODO);
         inventoryBook.setAddDate(LocalDate.now());
+        inventoryBook.setRating(0);
         return  inventoryBook;
     }
 
     // 다 읽었을 때
     public void finishInventoryBook(){
-        setCurrentPage(getPage());
-        setStatus(ReadStatus.DONE);
+        this.setCurrentPage(this.getPage());
+        this.setStatus(ReadStatus.DONE);
+        this.setReadDate(LocalDate.now());
     }
 
 

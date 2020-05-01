@@ -2,7 +2,7 @@ package com.bookcalendar.demo.repository;
 
 
 
-import com.bookcalendar.demo.dto.InventoryBookDto;
+import com.bookcalendar.demo.dto.InventoryBookWithBookDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +14,6 @@ public interface InventoryBookRepositoryCustom {
     List<BookScoreDto> getBookAddScoreOn(LocalDate from, LocalDate to);
     List<BookScoreDto> getBookReadScoreOn(LocalDate from, LocalDate to);
 
-    List<InventoryBookDto> getDtosByInventoryId(Long inventoryId);
-    Page<InventoryBookDto> getDtosByInventoryId(Long inventoryId, Pageable pageable);
+    List<InventoryBookWithBookDto> getDtosByInventoryId(Long inventoryId);
+    Page<InventoryBookWithBookDto> getDtosByInventoryId(Long inventoryId, Pageable pageable);
 }

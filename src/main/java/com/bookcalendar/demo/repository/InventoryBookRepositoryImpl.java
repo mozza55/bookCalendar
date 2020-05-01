@@ -1,12 +1,9 @@
 package com.bookcalendar.demo.repository;
 
-import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.domain.InventoryBook;
 import com.bookcalendar.demo.domain.QInventoryBook;
-import com.bookcalendar.demo.dto.InventoryBookDto;
-import com.querydsl.core.BooleanBuilder;
+import com.bookcalendar.demo.dto.InventoryBookWithBookDto;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.sql.SQLExpressions;
 
@@ -50,25 +47,25 @@ public class InventoryBookRepositoryImpl
     }
 
     @Override
-    public List<InventoryBookDto> getDtosByInventoryId(Long inventoryId) {
+    public List<InventoryBookWithBookDto> getDtosByInventoryId(Long inventoryId) {
         QInventoryBook inventoryBook = QInventoryBook.inventoryBook;
-        List<InventoryBookDto> inventoryBookDtoList = from(inventoryBook).select(Projections.constructor(InventoryBookDto.class,
+        List<InventoryBookWithBookDto> inventoryBookWithBookDtoList = from(inventoryBook).select(Projections.constructor(InventoryBookWithBookDto.class,
                 inventoryBook, inventoryBook.book))
                 .where(inventoryBook.inventory.id.eq(inventoryId))
                 .fetch();
-        return inventoryBookDtoList;
+        return inventoryBookWithBookDtoList;
     }
 
     @Override
-    public Page<InventoryBookDto> getDtosByInventoryId(Long inventoryId, Pageable pageable) {
+    public Page<InventoryBookWithBookDto> getDtosByInventoryId(Long inventoryId, Pageable pageable) {
         QInventoryBook inventoryBook = QInventoryBook.inventoryBook;
-        JPQLQuery<InventoryBookDto> query = from(inventoryBook).select(Projections.constructor(InventoryBookDto.class,
+        JPQLQuery<InventoryBookWithBookDto> query = from(inventoryBook).select(Projections.constructor(InventoryBookWithBookDto.class,
                 inventoryBook, inventoryBook.book))
                 .where(inventoryBook.inventory.id.eq(inventoryId))
                 .distinct();
 
         Long totalCount = query.fetchCount();
-        List<InventoryBookDto> results = getQuerydsl().applyPagination(pageable, query).fetch();
+        List<InventoryBookWithBookDto> results = getQuerydsl().applyPagination(pageable, query).fetch();
         return new PageImpl<>(results,pageable,totalCount);
     }
 }

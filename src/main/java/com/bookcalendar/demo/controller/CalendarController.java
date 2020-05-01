@@ -1,10 +1,9 @@
 package com.bookcalendar.demo.controller;
 
 import com.bookcalendar.demo.domain.Event;
-import com.bookcalendar.demo.domain.InventoryBook;
 import com.bookcalendar.demo.domain.Member;
 import com.bookcalendar.demo.dto.EventDto;
-import com.bookcalendar.demo.dto.InventoryBookDto;
+import com.bookcalendar.demo.dto.InventoryBookWithBookDto;
 import com.bookcalendar.demo.repository.EventRepository;
 import com.bookcalendar.demo.repository.InventoryBookRepository;
 import com.bookcalendar.demo.service.EventService;
@@ -35,7 +34,7 @@ public class CalendarController {
     public String getCalendar(@PathVariable Long calendarId, HttpSession session, Model model){
         Member member =(Member) session.getAttribute("member");
         //List<InventoryBook> inventoryBookList = inventoryBookRepository.findByInventoryIdWithBook(member.getInventory().getId());
-        List<InventoryBookDto> inventoryBookList = inventoryBookRepository.getDtosByInventoryId(member.getInventory().getId());
+        List<InventoryBookWithBookDto> inventoryBookList = inventoryBookRepository.getDtosByInventoryId(member.getInventory().getId());
         model.addAttribute("bookList",inventoryBookList);
         List<Event> eventList = eventRepository.findByCalendarId(calendarId);
 
@@ -45,9 +44,9 @@ public class CalendarController {
     }
     @GetMapping("/calendar/{calendarId}/test")
     @ResponseBody
-    public List<InventoryBookDto> testgetCalendar(@PathVariable Long calendarId, HttpSession session, Model model){
+    public List<InventoryBookWithBookDto> testgetCalendar(@PathVariable Long calendarId, HttpSession session, Model model){
         Member member =(Member) session.getAttribute("member");
-        List<InventoryBookDto> inventoryBookList = inventoryBookRepository.getDtosByInventoryId(calendarId);
+        List<InventoryBookWithBookDto> inventoryBookList = inventoryBookRepository.getDtosByInventoryId(calendarId);
 
         return inventoryBookList;
     }
