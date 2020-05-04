@@ -21,25 +21,36 @@ public class Inventory {
     @OneToMany(mappedBy = "inventory")
     private List<InventoryBook> inventoryBooks = new ArrayList<>();
 
-    private int bookCount;
+    private int addCount;
+    private int readCount;
     private int pagePerDay;
     private int bookPerDay;
 
     public Inventory() {
         bookPerDay=0;
         pagePerDay=0;
-        bookCount =0;
+        addCount =0;
+        readCount=0;
     }
 
     //연관관계 편의 메서드
     public void addBook(InventoryBook inventoryBook){
         this.inventoryBooks.add(inventoryBook);
         inventoryBook.setInventory(this);
-        //bookCount++;
+        this.addAddCount();
     }
 
-    public void removeBook(){
-        bookCount--;
+    public void addAddCount(){
+        addCount++;
+    }
+    public void addReadCount(){
+        readCount++;
+    }
+    public void removeAddCount(){
+        addCount--;
+    }
+    public void removeReadCount(){
+        readCount--;
     }
     //전체 페이지 수 조회
     public int getTotalPage(){

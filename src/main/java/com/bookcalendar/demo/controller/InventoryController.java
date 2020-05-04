@@ -19,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
 @Slf4j
@@ -84,15 +86,26 @@ public class InventoryController {
             return new ResponseEntity<>(message,HttpStatus.CONFLICT);
         }
     }
+
     @PutMapping("/inventorybooks")
     @ResponseBody
-    public ResponseEntity<Object> updateRatingOfInventoryBook(@RequestBody Long inventoryBookId,
-                                                              @RequestBody Integer rating,
-                                                              @RequestBody(required = false) ReadStatus status){
-        if(status!=null) log.info("status: "+status);
-        inventoryService.updateRating(inventoryBookId, rating);
+    public ResponseEntity<Object> updateRatingOfInventoryBook(@RequestBody Map<String, Object> param){
+        Long inventoryBookId = Long.parseLong(param.get("inventoryBookId").toString());
+        Integer rating = (Integer) param.get("rating");
+        ReadStatus status = ReadStatus.valueOf(param.get("status").toString());
+        if(status==ReadStatus.TODO) {
+            log.info("status: " + status);
+            inventoryService.updateRating(inventoryBookId, rating);
+        }else inventoryBookRepository.updateRating(inventoryBookId,rating);
+
         InventoryBookDto inventoryBookDto = inventoryBookRepository.findDtoById(inventoryBookId);
         return new ResponseEntity<>(inventoryBookDto,HttpStatus.OK);
     }
 
+    @DeleteMapping("/inventorybooks")
+    @ResponseBody
+    public ResponseEntity<Object> deleteInventoryBook(@RequestParam Long inventoryBookId){
+        inventoryService.deleteInventoryBook(inventoryBookId);
+        return new ResponseEntity<>("success",HttpStatus.OK);
+    }
 }

@@ -64,7 +64,8 @@
                     </li>
                     <li><div style="border-top: 1px solid #ccc; height: 10px; margin-top: 10px;"></div></li>
                     <li>
-                        <span th:text="${book.readCount}+'명이 끝까지 읽었습니다!'"></span>
+                        <span id="readCount" th:text="${book.readCount}"></span>
+                        <span>명이 끝까지 읽었습니다!</span>
                     </li>
                     <li>
                         <span id="addCount" th:text="${book.addCount}"></span>
@@ -85,8 +86,7 @@
                             'javascript:inventory_add(' + ${session.member.inventory.id} + ','+ ${book.id} +');'
                              ">서재에 담기</a>
                         <a id ="removeBook" class="btn btn-primary" style="display: none; width: fit-content"
-                           th:href="${session.member ==null} ?'javascript:login()':
-                            'javascript:inventory_add(' + ${session.member.inventory.id} + ','+ ${book.id} +');'
+                           th:href="${session.member !=null} ? 'javascript:inventory_remove();'
                              ">서재에서 지우기</a>
                     </li>
                 </ul>
@@ -109,38 +109,43 @@
         /*<![CDATA[*/
         var inventorybook;
         $(document).ready(function () {
-            var sessionChk = /*[[${#strings.isEmpty(session.member.id)}]]*/;
-            //console.log(sessionChk);
-            if(!/*[[${#strings.isEmpty(session.member.id)}]]*/){
-                $.ajax({
-                    url:"/inventorybooks",
-                    type: "GET",
-                    data:{
-                        inventoryId:/*[[${session.member.inventory.id}]]*/,
-                        bookId:/*[[ ${book.id} ]]*/
-                    },
-                    async: false,
-                    success:function(data,textStatus, jqXHR) {
-                        console.log(data);
-                        if( jqXHR.status == 200){
-                            inventorybook=data;
-                            $('#removeBook').css('display','block');
-                        }else{
-                            $('#addBook').css('display','block');
-                        }
-                    }
-                });
-
+            var sessionChk = /*[[${#strings.isEmpty(session.member)}]]*/;
+            if(!sessionChk){
+                chk();
+            }else{
+                $('#addBook').css('display','block');
             }
-
         });
+        function chk(){
+            var inventoryId =/*[[${session.member==null}? null :${session.member.inventory.id}]]*/;
+            var bookId= /*[[ ${book.id} ]]*/;
+            $.ajax({
+                url:"/inventorybooks",
+                type: "GET",
+                data:{
+                    inventoryId: inventoryId,
+                    bookId: bookId
+                },
+                async: false,
+                success:function(data,textStatus, jqXHR) {
+                    console.log(data);
+                    if( jqXHR.status == 200){
+                        inventorybook=data;
+                        $('#removeBook').css('display','block');
+                        var index = inventorybook.rating;
+                        $('.starRev span:nth-child(-n+'+index+')').addClass('on');
+                    }else{
+                        $('#addBook').css('display','block');
+                    }
+                }
+            });
+        }
 
         function login() {
             alert("로그인이 필요한 서비스입니다");
             document.location.href="/members/login"
         }
         function inventory_add(inventoryId, bookId, rating) {
-            console.log(inventoryId+' '+ bookId);
             $.ajax({
                 url:"/inventorybooks",
                 type: "POST",
@@ -151,52 +156,80 @@
                 },
                 async:true,
                 success:function (data,textStatus, jqXHR) {
-                    var count =/*[[ ${book.addCount} ]]*/;
-                    $("#addCount").text(count+1);
+                    console.log(rating)
+                    if(rating ==null) {
+                        var count =Number($("#addCount").text());
+                        $("#addCount").text(count + 1);
+                    }else{
+                        var count =Number($("#readCount").text());
+                        $("#readCount").text(count + 1);
+                    }
                     $("#addBook").css("display","none");
                     $("#removeBook").css("display","block");
                     inventorybook=data;
-                    console.log(inventorybook);
                 },
                 error:function (e) {//jqXHR
                     alert(e.status+e.statusText+' : ' +e.responseText );
                 }
             });
         }
+        function inventory_remove(){
+            console.log(inventorybook.id);
+            $.ajax({
+                url:"/inventorybooks",
+                type:"DELETE",
+                data:{ inventoryBookId: inventorybook.id},
+                async:true,
+                success:function (data) {
+                    if(inventorybook.status !='DONE'){
+                        var count = Number($("#addCount").text());
+                        $("#addCount").text(count-1);
+                    }else{
+                        var count =Number($("#readCount").text());
+                        $("#readCount").text(count-1);
+                    }
+                    inventorybook = null;
+                    $("#addBook").css("display","block");
+                    $("#removeBook").css("display","none");
+                    $('.starRev span').removeClass('on');
+
+                }
+            })
+        }
         $('.starRev span').click(function(){
-            console.log($(this).index());
             $(this).parent().children('span').removeClass('on');
             $(this).addClass('on').prevAll('span').addClass('on');
             var rating = $(this).index()+1;
-            if(/*[[${#strings.isEmpty(session.member.id)}]]*/) {
+            if(/*[[${#strings.isEmpty(session.member)}]]*/) {
                 login();
                 return false;
             }
             $("#addBook").css("display","none");
             $("#removeBook").css("display","block");
-            if(typeof inventorybook == 'undefined'){
-                var inventoryId= /*[[${session.member.inventory.id}]]*/;
+            if(typeof inventorybook == 'undefined' || inventorybook ==null){
+                var inventoryId= /*[[${session.member==null}? null :${session.member.inventory.id}]]*/;
                 var bookId= /*[[ ${book.id} ]]*/;
                 inventory_add(inventoryId, bookId, rating);
             }else{
-                var data = new Object();
-                data.inventoryBookId = inventorybook.id;
-                data.rating = rating;
-                if(inventorybook.status != 'DONE'){
-                    data.status = inventorybook.status;
-                }
-                var jsonData = JSON.stringify(data);
-                console.log(jsonData);
+                var params = new Object();
+                params.inventoryBookId = inventorybook.id;
+                params.rating = rating;
+                params.status = inventorybook.status;
+                var jsonData = JSON.stringify(params);
                 $.ajax({
                     url:"/inventorybooks",
                     type: "PUT",
-                    data: {
-                        inventoryBookId : inventorybook.id,
-                        rating : rating
-                    },
+                    dataType: "json",
+                    data: jsonData,
+                    contentType: 'application/json',
                     async:true,
                     success:function (data) {
-                        alert(data);
+                        if(params.status !='DONE'){
+                            var count = Number($("#readCount").text());
+                            $("#readCount").text(count + 1);
+                            var count = Number($("#addCount").text());
+                            $("#addCount").text(count-1);
+                        }
                         inventorybook=data;
                     }
                 });

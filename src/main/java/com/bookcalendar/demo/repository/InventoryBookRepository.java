@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,10 +37,12 @@ public interface InventoryBookRepository  extends JpaRepository<InventoryBook,Lo
 
 
     @Modifying //update, delete query 시 사용하는 어노테이션 return; number of rows
+    @Transactional
     @Query("update InventoryBook ib set ib.currentPage =?2 where ib.id=?1")
     int updateCurrentPage(Long inventoryBookId, int page);
 
     @Modifying //update, delete query 시 사용하는 어노테이션 return; number of rows
+    @Transactional
     @Query("update InventoryBook ib set ib.rating =?2 where ib.id=?1")
     int updateRating(Long inventoryBookId, int rating);
 

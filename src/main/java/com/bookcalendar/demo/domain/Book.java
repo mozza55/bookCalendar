@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,7 +28,7 @@ public class Book {
     private Category category;
 
     @OneToMany(mappedBy ="book")
-    private List<InventoryBook> inventoryBookList;
+    private List<InventoryBook> inventoryBookList = new ArrayList<>();
 
     private double rating;
 
@@ -57,5 +58,11 @@ public class Book {
             throw new NotEnoughCountException("읽은 독자 없음");
         }
         this.readCount--;
+    }
+    public void removeAddCount(){
+        if(this.addCount-1 <0 ){
+            throw new NotEnoughCountException("읽은 독자 없음");
+        }
+        this.addCount--;
     }
 }

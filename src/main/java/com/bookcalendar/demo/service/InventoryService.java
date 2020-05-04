@@ -3,6 +3,7 @@ package com.bookcalendar.demo.service;
 import com.bookcalendar.demo.domain.Book;
 import com.bookcalendar.demo.domain.Inventory;
 import com.bookcalendar.demo.domain.InventoryBook;
+import com.bookcalendar.demo.domain.ReadStatus;
 import com.bookcalendar.demo.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,24 +43,21 @@ public class InventoryService {
         validateDuplicateBook(inventoryId,bookId);
         //책 추가
         Book book = bookRepository.getOne(bookId);
-        book.addAddCount();
-        InventoryBook inventoryBook = InventoryBook.createInventoryBook(book);
         Inventory inventory= inventoryRepository.getOne(inventoryId);
-        inventory.addBook(inventoryBook);
+        InventoryBook inventoryBook = InventoryBook.createInventoryBook(book,inventory);
         InventoryBook savedBook = inventoryBookRepository.save(inventoryBook);
         return  savedBook.getId();
     }
-    @Transactional//책 담기
+    @Transactional//다 읽은 책 담기
     public Long addFinishedBook(Long inventoryId, Long bookId, int rating){
         log.info("rating gg : "+rating);
         //중복책 확인
         validateDuplicateBook(inventoryId,bookId);
         //책 추가
         Book book = bookRepository.getOne(bookId);
-        book.addAddCount();
-        InventoryBook inventoryBook = InventoryBook.createInventoryBook(book);
         Inventory inventory= inventoryRepository.getOne(inventoryId);
-        inventory.addBook(inventoryBook);
+        InventoryBook inventoryBook = InventoryBook.createInventoryBook(book,inventory);
+
         //
         inventoryBook.finishInventoryBook();
         inventoryBook.setRating(rating);
@@ -75,18 +73,18 @@ public class InventoryService {
             throw new IllegalStateException("이미 등록된 책입니다");
         }
     }
-    //책 빼기
-    public Long removeBook(Long memberId, Long inventoryBookId){
-        Inventory inventory = inventoryV1Repository.findByMemberId(memberId);
-        InventoryBook inventoryBook = inventoryBookV1Repository.findOne(inventoryBookId);
-        inventoryBookV1Repository.removeOne(inventoryBook);
-        return  inventory.getId();
-    }
 
     @Transactional
     public void updateRating(Long inventorybookId, Integer rating) {
         InventoryBook inventoryBook = inventoryBookRepository.getOne(inventorybookId);
         inventoryBook.finishInventoryBook();
         inventoryBook.setRating(rating);
+    }
+
+    @Transactional
+    public void deleteInventoryBook(Long inventoryBookId) {
+        InventoryBook inventoryBook = inventoryBookRepository.findById(inventoryBookId).get();
+        inventoryBook.removeInventoryBook();
+        inventoryBookRepository.delete(inventoryBook);
     }
 }
